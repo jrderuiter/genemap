@@ -51,6 +51,7 @@ def _setup_basic_parser(parser):
     # Add from/to type options.
     parser.add_argument('--from-type', default='ensembl')
     parser.add_argument('--to-type', default='ensembl')
+    parser.add_argument('--organism', default='hsapiens')
 
     # Add version specification.
     parser.add_argument('--version', choices=list_versions(),

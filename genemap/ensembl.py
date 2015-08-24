@@ -104,6 +104,12 @@ def map_ids(ids, from_type='ensembl', to_type='ensembl',
     Raises:
         ValueError: If `from_type` is equal to `to_type`.
 
+    Examples:
+        Translating human gene symbols to ensembl ids:
+
+        >>> list(map_ids(['FGFR2', 'MYH9'], from_type='symbol', cache=False))
+        ['ENSG00000066468', 'ENSG00000100345']
+
     """
 
     if from_type == to_type:
@@ -123,7 +129,8 @@ def map_ids(ids, from_type='ensembl', to_type='ensembl',
                             map_filter=map_filter)
 
 
-def map_homology(ids, from_org, to_org, from_type='ensembl', to_type='ensembl',
+def map_homology(ids, from_org='hsapiens', to_org='hsapiens',
+                 from_type='ensembl', to_type='ensembl',
                  remove_duplicates='from', version='current',
                  cache=True, cache_dir=DEFAULT_CACHE_DIR, map_filter=None):
     """Maps gene ids between two different species (and id types).
@@ -160,6 +167,14 @@ def map_homology(ids, from_org, to_org, from_type='ensembl', to_type='ensembl',
 
     Raises:
         ValueError: If `from_type` is equal to `to_type`.
+
+    Examples:
+        Mapping human gene symbols to mouse gene symbols:
+
+        >>> list(map_homology(['FGFR2', 'MYH9'], from_org='hsapiens',
+        >>> ...               to_type='symbol', from_type='symbol',
+        >>> ...               cache=False))
+            ['Fgfr2', 'Myh9']
 
     """
 

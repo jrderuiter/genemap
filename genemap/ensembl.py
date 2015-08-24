@@ -51,27 +51,71 @@ DEFAULT_CACHE_DIR = '_gm_cache'
 
 
 def list_versions():
+    """ List the available versions.
+
+    Returns:
+        List[str]: List of available versions.
+
+    """
     return list(ENSEMBL_HOSTS.keys())
 
 
 def list_aliases(version='current'):
+    """ Return the available aliases for gene ids.
+
+    Returns:
+        Dict[str,str]: Dict of aliases.
+
+    """
     return ENSEMBL_ALIASES[version]
 
 
-def map_ids(ids, from_='ensembl', to='ensembl',
+def map_ids(ids, from_type='ensembl', to_type='ensembl',
             remove_duplicates='from', version='current',
             organism='hsapiens', cache=True,
             cache_dir=DEFAULT_CACHE_DIR, map_filter=None):
-    if from_ == to:
-        raise ValueError('from_ and to should not be the same')
+    """Maps gene ids between two different id types.
+
+    This function using biomart (via biomaRt for now) to translate
+    a given set of gene ids from one id type to another. Examples
+    are symbol --> entrez or ensembl --> symbol. The most commonly
+    used ids can be referenced via aliases (e.g. symbol for gene
+    symbol), for a full list of these aliases see `list_aliases`.
+
+    Args:
+        ids (List[str]): List of gene ids to translate.
+        from_type (str): Name of the id type to translate from.
+        to_type (str): Name of the id type to translate to.
+        remove_duplicates (str): String specifying how to handle duplicates.
+            Possible values are `from`, which only drops one-to-many mappings
+            from the `from` side of the mapping, or `both` which drops
+            mappings that have a one-to-many mapping in any direction.
+        version (str): String specifying which ensembl version to use.
+            See `list_versions` for possible values.
+        organism (str): The organism to use.
+        cache (bool): Whether to cache mappings on disk.
+        cache_dir (str): Path of the directory to use to store cached mappings.
+
+    Returns:
+        pandas.Series: Mapping of ids from their original id (contained in
+            the index of the series) and the mapped id. Ids without a mapping
+            will be represented by a NaN value.
+
+    Raises:
+        ValueError: If `from_type` is equal to `to_type`.
+
+    """
+
+    if from_type == to_type:
+        raise ValueError('from_type and to_type should not be the same')
 
     # Get map frame.
-    map_frame = get_id_map(from_, to, version=version, organism=organism,
-                           cache=cache, cache_dir=cache_dir)
+    map_frame = get_id_map(from_type, to_type, version=version,
+                           organism=organism, cache=cache, cache_dir=cache_dir)
 
     # Select from/to columns.
-    from_col = _format_name(organism, from_)
-    to_col = _format_name(organism, to)
+    from_col = _format_name(organism, from_type)
+    to_col = _format_name(organism, to_type)
 
     # Return mapped ids.
     return map_ids_with_map(ids, map_frame, remove_duplicates,
@@ -79,21 +123,58 @@ def map_ids(ids, from_='ensembl', to='ensembl',
                             map_filter=map_filter)
 
 
-def map_homology(ids, from_, to, from_type='ensembl', to_type='ensembl',
+def map_homology(ids, from_org, to_org, from_type='ensembl', to_type='ensembl',
                  remove_duplicates='from', version='current',
                  cache=True, cache_dir=DEFAULT_CACHE_DIR, map_filter=None):
-    if from_ == to:
-        raise ValueError('from_ and to should not be the same')
+    """Maps gene ids between two different species (and id types).
+
+    This function using biomart (via biomaRt for now) to translate
+    a given set of gene ids from one organism to orthologous genes
+    in another species, optionally translating between different
+    identifier types if needed (using map_ids). Examples are translating
+    from mouse --> human of human --> mouse.
+
+    Args:
+        ids (List[str]): List of gene ids to translate.
+
+        from_org (str): Name of the species to translate from.
+        to_org (str): Name of the species to translate to.
+
+        from_type (str): Name of the id type to translate from.
+        to_type (str): Name of the id type to translate to.
+
+        remove_duplicates (str): String specifying how to handle duplicates.
+            Possible values are `from`, which only drops one-to-many mappings
+            from the `from` side of the mapping, or `both` which drops
+            mappings that have a one-to-many mapping in any direction.
+        version (str): String specifying which ensembl version to use.
+            See `list_versions` for possible values.
+
+        cache (bool): Whether to cache mappings on disk.
+        cache_dir (str): Path of the directory to use to store cached mappings.
+
+    Returns:
+        pandas.Series: Mapping of ids from their original id (contained in
+            the index of the series) and the mapped id. Ids without a mapping
+            will be represented by a NaN value.
+
+    Raises:
+        ValueError: If `from_type` is equal to `to_type`.
+
+    """
+
+    if from_org == to_org:
+        raise ValueError('from_org and to_org should not be the same')
 
     # Get map frame.
     map_frame = get_homology_id_map(
-        from_, to, from_type=from_type,
+        from_org, to_org, from_type=from_type,
         to_type=to_type, version=version,
         cache=cache, cache_dir=cache_dir)
 
     # Select from/to columns.
-    from_col = _format_name(from_, from_type)
-    to_col = _format_name(to, to_type)
+    from_col = _format_name(from_org, from_type)
+    to_col = _format_name(to_org, to_type)
 
     # Return mapped ids.
     return map_ids_with_map(ids, map_frame, remove_duplicates,
@@ -159,72 +240,74 @@ def duplicate_mask(frame, column):
 
 # --- Map retrieval functions --- #
 
-def get_id_map(from_, to, version='current', organism='hsapiens',
+def get_id_map(from_type, to_type, version='current', organism='hsapiens',
                cache=True, cache_dir=DEFAULT_CACHE_DIR):
     # Try to lookup column as alias.
-    from_column = ENSEMBL_ALIASES[version].get(from_, from_)
-    to_column = ENSEMBL_ALIASES[version].get(to, to)
+    from_column = ENSEMBL_ALIASES[version].get(from_type, from_type)
+    to_column = ENSEMBL_ALIASES[version].get(to_type, to_type)
 
     # Get map from Ensembl.
     map_ = get_map(from_=from_column, to=to_column, version=version,
                    organism=organism, cache=cache, cache_dir=cache_dir)
 
     # Override map names.
-    map_.columns = [_format_name(organism, from_),
-                    _format_name(organism, to)]
+    map_.columns = [_format_name(organism, from_type),
+                    _format_name(organism, to_type)]
 
     return map_
 
 
-def get_homology_map(from_, to, version='current',
+def get_homology_map(from_org, to_org, version='current',
                      cache=True, cache_dir=DEFAULT_CACHE_DIR):
     # Determine column names for version.
     from_column = 'ensembl_gene_id'
-    to_column = to + '_homolog_ensembl_gene'
+    to_column = to_org + '_homolog_ensembl_gene'
 
     # Get map from Ensembl.
     map_ = get_map(from_=from_column, to=to_column, version=version,
-                   organism=from_, cache=cache, cache_dir=cache_dir)
+                   organism=from_org, cache=cache, cache_dir=cache_dir)
 
     # Override map names.
-    map_.columns = [_format_name(from_, 'ensembl'),
-                    _format_name(to, 'ensembl')]
+    map_.columns = [_format_name(from_org, 'ensembl'),
+                    _format_name(to_org, 'ensembl')]
 
     return map_
 
 
 def get_homology_id_map(
-        from_, to, from_type='ensembl', to_type='ensembl',
+        from_org, to_org, from_type='ensembl', to_type='ensembl',
         version='current', cache=True, cache_dir=DEFAULT_CACHE_DIR):
 
     # Get 'from' map.
     if from_type != 'ensembl':
-        from_map = get_id_map(from_=from_type, to='ensembl', organism=from_,
-                              version=version, cache=cache, cache_dir=cache_dir)
+        from_map = get_id_map(from_type=from_type, to_type='ensembl',
+                              organism=from_org, version=version,
+                              cache=cache, cache_dir=cache_dir)
     else:
         from_map = None
 
     # Get 'homology' map.
-    homology_map = get_homology_map(from_, to, version=version,
+    homology_map = get_homology_map(from_org, to_org, version=version,
                                     cache=cache, cache_dir=cache_dir)
 
     # Get 'to' map.
     if to_type != 'ensembl':
-        to_map = get_id_map(from_='ensembl', to=to_type, organism=to,
-                            version=version, cache=cache, cache_dir=cache_dir)
+        to_map = get_id_map(from_type='ensembl', to_type=to_type,
+                            organism=to_org, version=version,
+                            cache=cache, cache_dir=cache_dir)
     else:
         to_map = None
 
     # Join the three maps together.
     if from_map is not None:
         map_frame = pd.merge(from_map, homology_map,
-                             on=_format_name(from_, 'ensembl'))
+                             on=_format_name(from_org, 'ensembl'))
     else:
         map_frame = homology_map
 
     if to_map is not None:
         map_frame = pd.merge(map_frame, to_map,
-                             on=_format_name(to, 'ensembl'))
+                             on=_format_name(to_org, 'ensembl'))
 
     return map_frame
 

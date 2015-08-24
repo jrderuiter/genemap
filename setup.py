@@ -9,7 +9,7 @@ setup(
     author='Julian de Ruiter',
     author_email='julianderuiter@gmail.com',
     description='',
-    license='BSD',
+    license='MIT',
     packages=find_packages(),
     include_package_data=True,
     entry_points={'console_scripts': [

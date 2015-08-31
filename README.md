@@ -28,7 +28,7 @@ genemap homology --no-cache --from-type symbol --to-type symbol --to-org mmuscul
 ```
 
 ## Dependencies
-- Python 2.7 or 3.3+
+- Python 3.3+, currently untested on Python 2.7 (legacy Python)
 - pandas
 - pybiomart (<https://github.com/jrderuiter/pybiomart>)
 

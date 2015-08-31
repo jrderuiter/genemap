@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-install_requires = ['pandas', 'rpy2']
+install_requires = ['pandas', 'pybiomart']
 
 setup(
     name='genemap',

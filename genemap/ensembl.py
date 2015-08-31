@@ -4,12 +4,10 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input,
                       int, map, next, oct, open, pow, range, round,
                       str, super, zip)
 
-import os
 from functools import reduce
 
+import pybiomart
 import pandas as pd
-
-from .biomart import use_mart, get_bm
 
 
 ENSEMBL_HOSTS = {
@@ -44,8 +42,6 @@ ENSEMBL_ALIASES = {
     'ensembl_67': ID_ALIASES_PRE_76
 }
 
-DEFAULT_CACHE_DIR = '_gm_cache'
-
 
 # --- Main mapping functions --- #
 
@@ -72,8 +68,7 @@ def list_aliases(version='current'):
 
 def map_ids(ids, from_type='ensembl', to_type='ensembl',
             remove_duplicates='from', version='current',
-            organism='hsapiens', cache=True,
-            cache_dir=DEFAULT_CACHE_DIR, map_filter=None):
+            organism='hsapiens', cache=True):
     """Maps gene ids between two different id types.
 
     This function using biomart (via biomaRt for now) to translate
@@ -93,8 +88,7 @@ def map_ids(ids, from_type='ensembl', to_type='ensembl',
         version (str): String specifying which ensembl version to use.
             See `list_versions` for possible values.
         organism (str): The organism to use.
-        cache (bool): Whether to cache mappings on disk.
-        cache_dir (str): Path of the directory to use to store cached mappings.
+        cache (bool): Whether to cache requests.
 
     Returns:
         pandas.Series: Mapping of ids from their original id (contained in
@@ -117,7 +111,7 @@ def map_ids(ids, from_type='ensembl', to_type='ensembl',
 
     # Get map frame.
     map_frame = get_id_map(from_type, to_type, version=version,
-                           organism=organism, cache=cache, cache_dir=cache_dir)
+                           organism=organism, cache=cache)
 
     # Select from/to columns.
     from_col = _format_name(organism, from_type)
@@ -125,14 +119,12 @@ def map_ids(ids, from_type='ensembl', to_type='ensembl',
 
     # Return mapped ids.
     return map_ids_with_map(ids, map_frame, remove_duplicates,
-                            from_col=from_col, to_col=to_col,
-                            map_filter=map_filter)
+                            from_col=from_col, to_col=to_col)
 
 
 def map_homology(ids, from_org='hsapiens', to_org='hsapiens',
                  from_type='ensembl', to_type='ensembl',
-                 remove_duplicates='from', version='current',
-                 cache=True, cache_dir=DEFAULT_CACHE_DIR, map_filter=None):
+                 remove_duplicates='from', version='current', cache=True):
     """Maps gene ids between two different species (and id types).
 
     This function using biomart (via biomaRt for now) to translate
@@ -157,8 +149,7 @@ def map_homology(ids, from_org='hsapiens', to_org='hsapiens',
         version (str): String specifying which ensembl version to use.
             See `list_versions` for possible values.
 
-        cache (bool): Whether to cache mappings on disk.
-        cache_dir (str): Path of the directory to use to store cached mappings.
+        cache (bool): Whether to cache requests.
 
     Returns:
         pandas.Series: Mapping of ids from their original id (contained in
@@ -172,8 +163,8 @@ def map_homology(ids, from_org='hsapiens', to_org='hsapiens',
         Mapping human gene symbols to mouse gene symbols:
 
         >>> list(map_homology(['FGFR2', 'MYH9'], from_org='hsapiens',
-        >>> ...               to_type='symbol', from_type='symbol',
-        >>> ...               cache=False))
+        >>>                   to_type='symbol', from_type='symbol',
+        >>>                   cache=False))
             ['Fgfr2', 'Myh9']
 
     """
@@ -184,8 +175,7 @@ def map_homology(ids, from_org='hsapiens', to_org='hsapiens',
     # Get map frame.
     map_frame = get_homology_id_map(
         from_org, to_org, from_type=from_type,
-        to_type=to_type, version=version,
-        cache=cache, cache_dir=cache_dir)
+        to_type=to_type, version=version, cache=cache)
 
     # Select from/to columns.
     from_col = _format_name(from_org, from_type)
@@ -193,8 +183,7 @@ def map_homology(ids, from_org='hsapiens', to_org='hsapiens',
 
     # Return mapped ids.
     return map_ids_with_map(ids, map_frame, remove_duplicates,
-                            from_col=from_col, to_col=to_col,
-                            map_filter=map_filter)
+                            from_col=from_col, to_col=to_col)
 
 
 def map_ids_with_map(ids, map_frame, remove_duplicates='from',
@@ -255,61 +244,63 @@ def duplicate_mask(frame, column):
 
 # --- Map retrieval functions --- #
 
-def get_id_map(from_type, to_type, version='current', organism='hsapiens',
-               cache=True, cache_dir=DEFAULT_CACHE_DIR):
+def get_id_map(from_type, to_type, version='current',
+               organism='hsapiens', cache=True):
     # Try to lookup column as alias.
     from_column = ENSEMBL_ALIASES[version].get(from_type, from_type)
     to_column = ENSEMBL_ALIASES[version].get(to_type, to_type)
 
-    # Get map from Ensembl.
-    map_ = get_map(from_=from_column, to=to_column, version=version,
-                   organism=organism, cache=cache, cache_dir=cache_dir)
+    # Get map_frame from Ensembl.
+    server = pybiomart.Server(host=ENSEMBL_HOSTS[version], use_cache=cache)
 
-    # Override map names.
-    map_.columns = [_format_name(organism, from_type),
-                    _format_name(organism, to_type)]
+    map_frame = (server.marts['ENSEMBL_MART_ENSEMBL']
+                       .datasets[organism + '_gene_ensembl']
+                       .query(attributes=[from_column, to_column]))
 
-    return map_
+    # Override map names to reflect requested types.
+    map_frame.columns = [_format_name(organism, from_type),
+                         _format_name(organism, to_type)]
+
+    return map_frame
 
 
-def get_homology_map(from_org, to_org, version='current',
-                     cache=True, cache_dir=DEFAULT_CACHE_DIR):
+def get_homology_map(from_org, to_org, version='current', cache=True):
     # Determine column names for version.
     from_column = 'ensembl_gene_id'
     to_column = to_org + '_homolog_ensembl_gene'
 
-    # Get map from Ensembl.
-    map_ = get_map(from_=from_column, to=to_column, version=version,
-                   organism=from_org, cache=cache, cache_dir=cache_dir)
+    # Get map_frame from Ensembl.
+    server = pybiomart.Server(host=ENSEMBL_HOSTS[version], use_cache=cache)
 
-    # Override map names.
-    map_.columns = [_format_name(from_org, 'ensembl'),
-                    _format_name(to_org, 'ensembl')]
+    map_frame = (server.marts['ENSEMBL_MART_ENSEMBL']
+                       .datasets[from_org + '_gene_ensembl']
+                       .query(attributes=[from_column, to_column]))
 
-    return map_
+    # Override map names to reflect requested types.
+    map_frame.columns = [_format_name(from_org, 'ensembl'),
+                         _format_name(to_org, 'ensembl')]
+
+    return map_frame
 
 
-def get_homology_id_map(
-        from_org, to_org, from_type='ensembl', to_type='ensembl',
-        version='current', cache=True, cache_dir=DEFAULT_CACHE_DIR):
+def get_homology_id_map(from_org, to_org, from_type='ensembl',
+                        to_type='ensembl', version='current', cache=True):
 
     # Get 'from' map.
     if from_type != 'ensembl':
         from_map = get_id_map(from_type=from_type, to_type='ensembl',
-                              organism=from_org, version=version,
-                              cache=cache, cache_dir=cache_dir)
+                              organism=from_org, version=version, cache=cache)
     else:
         from_map = None
 
     # Get 'homology' map.
-    homology_map = get_homology_map(from_org, to_org, version=version,
-                                    cache=cache, cache_dir=cache_dir)
+    homology_map = get_homology_map(from_org, to_org,
+                                    version=version, cache=cache)
 
     # Get 'to' map.
     if to_type != 'ensembl':
         to_map = get_id_map(from_type='ensembl', to_type=to_type,
-                            organism=to_org, version=version,
-                            cache=cache, cache_dir=cache_dir)
+                            organism=to_org, version=version, cache=cache)
     else:
         to_map = None
 
@@ -329,66 +320,3 @@ def get_homology_id_map(
 
 def _format_name(organism, id_name):
     return '{}_{}'.format(organism, id_name)
-
-
-# --- 'Low-level' map retrieval/caching functions --- #
-
-def get_map(from_, to, version='current', organism='hsapiens',
-            cache=True, cache_dir=DEFAULT_CACHE_DIR):
-    # Try to fetch map_frame from cache.
-    map_frame = None
-    if cache:
-        map_frame = _map_cache_get(organism, version, from_, to, cache_dir)
-
-    if map_frame is None:
-        # Get Ensembl mart if not in cache or no cache.
-        mart = use_mart(biomart='ENSEMBL_MART_ENSEMBL',
-                        host=ENSEMBL_HOSTS[version],
-                        dataset=organism + '_gene_ensembl')
-
-        # Fetch mapping frame from biomart.
-        map_frame = get_bm(mart=mart, attributes=[from_, to])
-        map_frame.dropna(inplace=True)
-
-    # Write to cache if needed.
-    if cache:
-        _map_cache_put(map_frame, organism, version, from_, to, cache_dir)
-
-    # Convert to string to ensure that ids are strings.
-    # TODO: handle this more intelligently?
-    map_frame = map_frame.astype(str)
-
-    return map_frame
-
-
-def _map_cache_get(organism, version, from_col, to_col, cache_dir):
-    map_frame = None
-
-    if os.path.exists(cache_dir):
-        cache_names = [_map_cache_name(organism, version, from_col, to_col),
-                       _map_cache_name(organism, version, to_col, from_col)]
-
-        # Try both from-to and to-from names, break on hit.
-        for cache_name in cache_names:
-            cache_path = os.path.join(cache_dir, cache_name)
-
-            if os.path.exists(cache_path):
-                map_frame = pd.read_csv(cache_path, sep='\t')
-                map_frame = map_frame[[from_col, to_col]]
-                break
-
-    return map_frame
-
-
-def _map_cache_put(frame, organism, version, from_col, to_col, cache_dir):
-    if not os.path.exists(cache_dir):
-        os.makedirs(cache_dir)
-
-    cache_name = _map_cache_name(organism, version, from_col, to_col)
-    cache_path = os.path.join(cache_dir, cache_name)
-
-    frame.to_csv(cache_path, sep='\t', index=False)
-
-
-def _map_cache_name(organism, version, from_col, to_col):
-    return '{}.{}.{}-{}.txt'.format(organism, version, from_col, to_col)

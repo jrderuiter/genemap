@@ -81,8 +81,7 @@ def _main_id(args):
         mapped = map_ids(
             gene_ids, from_type=args.from_type, to_type=args.to_type,
             organism=args.organism, remove_duplicates='from',
-            cache=not args.no_cache, cache_dir=args.cache_dir,
-            version=args.version)
+            cache=not args.no_cache, version=args.version)
 
         if args.as_map:
             # Print as map (from --> to).
@@ -95,7 +94,7 @@ def _main_id(args):
         # Get and print the entire gene map.
         mapped = get_id_map(from_type=args.from_type, to_type=args.to_type,
                             version=args.version, organism=args.organism,
-                            cache=not args.no_cache, cache_dir=args.cache_dir)
+                            cache=not args.no_cache)
         _print_map(mapped, file_path=args.output, na_value=args.na_value)
 
 
@@ -106,8 +105,8 @@ def _main_homology(args):
         # Get id mapping for the passed gene ids.
         mapped = map_homology(
             args.gene_id, from_type=args.from_type, to_type=args.to_type,
-            from_org=args.from_org, to_org=args.to_org, remove_duplicates='from',
-            cache=not args.no_cache, cache_dir=args.cache_dir,
+            from_org=args.from_org, to_org=args.to_org,
+            remove_duplicates='from', cache=not args.no_cache,
             version=args.version)
 
         if args.as_map:
@@ -122,8 +121,7 @@ def _main_homology(args):
         mapped = get_homology_id_map(
             from_org=args.from_org, to_org=args.to_org,
             from_type=args.from_type, to_type=args.to_type,
-            version=args.version,
-            cache=not args.no_cache, cache_dir=args.cache_dir)
+            version=args.version, cache=not args.no_cache)
         _print_map(mapped, file_path=args.output, na_value=args.na_value)
 
 

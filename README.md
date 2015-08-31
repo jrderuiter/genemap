@@ -12,7 +12,7 @@ map_ids(['FGFR2', 'MYH9'], from_type='symbol', cache=False))
 
 Mapping human gene symbols to mouse gene symbols:
 ```{python}
-map_homology(['FGFR2', 'MYH9'], from_org='hsapiens',
+map_homology(['FGFR2', 'MYH9'], from_org='hsapiens', to_org='mmusculus',
              to_type='symbol', from_type='symbol', cache=False))
 ```
 
@@ -31,8 +31,7 @@ genemap homology --no-cache --from-type symbol --to-type symbol --to-org mmuscul
 ## Dependencies
 - Python 2.7 or 3.3+
 - pandas
-- rpy2
-- R with biomaRt package installed
+- pybiomart (<https://github.com/jrderuiter/pybiomart>)
 
 ## Installation
 

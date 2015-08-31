@@ -1,6 +1,5 @@
 # Genemap
-A python library + command line tool for mapping gene ids between different types and species. Ids are translated using Ensembl, which is accessed via the R biomaRt interface. Caching of fetched maps is provided to allow for fast repeated querying and/or offline use.
-
+A python library + command line tool for mapping gene ids between different types and species. Ids are translated using Ensembl, which is accessed via the pybiomart.
 ## Examples
 
 ### Library

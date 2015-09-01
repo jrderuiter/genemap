@@ -253,7 +253,7 @@ def get_id_map(from_type, to_type, version='current',
     # Get map_frame from Ensembl.
     server = pybiomart.Server(host=ENSEMBL_HOSTS[version], use_cache=cache)
 
-    map_frame = (server.marts['ENSEMBL_MART_ENSEMBL']
+    map_frame = (server.databases['ENSEMBL_MART_ENSEMBL']
                        .datasets[organism + '_gene_ensembl']
                        .query(attributes=[from_column, to_column]))
 
@@ -272,7 +272,7 @@ def get_homology_map(from_org, to_org, version='current', cache=True):
     # Get map_frame from Ensembl.
     server = pybiomart.Server(host=ENSEMBL_HOSTS[version], use_cache=cache)
 
-    map_frame = (server.marts['ENSEMBL_MART_ENSEMBL']
+    map_frame = (server.databases['ENSEMBL_MART_ENSEMBL']
                        .datasets[from_org + '_gene_ensembl']
                        .query(attributes=[from_column, to_column]))
 

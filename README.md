@@ -1,6 +1,5 @@
 # Genemap
-A python library + command line tool for mapping gene ids between different types and species. Ids are translated using Ensembl, which is accessed via the R biomaRt interface. Caching of fetched maps is provided to allow for fast repeated querying and/or offline use.
-
+A python library + command line tool for mapping gene ids between different types and species. Ids are translated using Ensembl, which is accessed via the pybiomart.
 ## Examples
 
 ### Library
@@ -12,7 +11,7 @@ map_ids(['FGFR2', 'MYH9'], from_type='symbol', cache=False))
 
 Mapping human gene symbols to mouse gene symbols:
 ```{python}
-map_homology(['FGFR2', 'MYH9'], from_org='hsapiens',
+map_homology(['FGFR2', 'MYH9'], from_org='hsapiens', to_org='mmusculus',
              to_type='symbol', from_type='symbol', cache=False))
 ```
 
@@ -29,14 +28,17 @@ genemap homology --no-cache --from-type symbol --to-type symbol --to-org mmuscul
 ```
 
 ## Dependencies
-- Python 2.7 or 3.3+
+- Python 3.3+, currently untested on Python 2.7 (legacy Python)
 - pandas
-- rpy2
-- R with biomaRt package installed
+- pybiomart (<https://github.com/jrderuiter/pybiomart>)
 
 ## Installation
 
 ```{bash}
+# Install pybiomart dependency.
+pip install git+git://github.com/jrderuiter/pybiomart.git#egg=pybiomart
+
+# Install genemap.
 pip install git+git://github.com/jrderuiter/genemap.git#egg=genemap
 ```
 

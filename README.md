@@ -35,6 +35,10 @@ genemap homology --no-cache --from-type symbol --to-type symbol --to-org mmuscul
 ## Installation
 
 ```{bash}
+# Install pybiomart dependency.
+pip install git+git://github.com/jrderuiter/pybiomart.git#egg=pybiomart
+
+# Install genemap.
 pip install git+git://github.com/jrderuiter/genemap.git#egg=genemap
 ```
 

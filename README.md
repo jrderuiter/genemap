@@ -6,38 +6,20 @@ A python library + command line tool for mapping gene ids between different type
 
 Translating human gene symbols to ensembl ids:
 ```{python}
-map_ids(['FGFR2', 'MYH9'], from_type='symbol', cache=False))
-```
-
-Mapping human gene symbols to mouse gene symbols:
-```{python}
-map_homology(['FGFR2', 'MYH9'], from_org='hsapiens', to_org='mmusculus',
-             to_type='symbol', from_type='symbol', cache=False))
+map_ids(['FGFR2', 'MYH9'], from_type='symbol', to_type='ensembl', cache=False))
 ```
 
 ### Command line tool
 
-Mapping human gene symbols to ensembl ids:
-```{bash}
-genemap id --no-cache --from-type symbol FGFR2 MYH9
-```
-
-Mapping human gene symbols to mouse gene symbols:
-```{bash}
-genemap homology --no-cache --from-type symbol --to-type symbol --to-org mmusculus FGFR2 MYH9
-```
-
 ## Dependencies
-- Python 3.3+, currently untested on Python 2.7 (legacy Python)
+- Python 2.7, 3.3+
+- future
 - pandas
 - pybiomart (<https://github.com/jrderuiter/pybiomart>)
 
 ## Installation
 
 ```{bash}
-# Install pybiomart dependency.
-pip install git+git://github.com/jrderuiter/pybiomart.git#egg=pybiomart
-
 # Install genemap.
 pip install git+git://github.com/jrderuiter/genemap.git#egg=genemap
 ```

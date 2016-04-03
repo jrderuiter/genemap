@@ -2,4 +2,4 @@
 source = genemap
 
 [report]
-omit = genemap/main/*.py
+omit = genemap/main/*.py,genemap/_version.py

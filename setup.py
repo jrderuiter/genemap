@@ -1,11 +1,11 @@
+import versioneer
 from setuptools import setup, find_packages
-from version import get_git_version
 
-install_requires = ['pandas', 'pybiomart']
 
 setup(
     name='genemap',
-    version=get_git_version(),
+    version=versioneer.get_version(),
+     cmdclass=versioneer.get_cmdclass(),
     url='',
     author='Julian de Ruiter',
     author_email='julianderuiter@gmail.com',
@@ -19,5 +19,5 @@ setup(
     extras_require={},
     zip_safe=True,
     classifiers=[],
-    install_requires=install_requires
+    install_requires=['future', 'pandas', 'pybiomart']
 )

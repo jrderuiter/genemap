@@ -1,1 +1,2 @@
-include RELEASE-VERSION
+include versioneer.py
+include genemap/_version.py

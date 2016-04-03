@@ -2,3 +2,6 @@
 genemap.egg-info
 __pycache__
 *.pyc
+.cache
+.coverage
+htmlcov

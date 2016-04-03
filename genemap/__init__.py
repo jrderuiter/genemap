@@ -1,2 +1,4 @@
-from .ensembl import (list_versions, list_aliases, map_ids, map_homology,
-                      get_id_map, get_homology_map, get_homology_id_map)
+
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions

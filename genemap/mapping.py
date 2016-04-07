@@ -6,7 +6,7 @@ from builtins import *
 import pandas as pd
 
 # pylint: disable=E0401
-from .ensembl import get_map
+from . import ensembl
 # pylint: enable=E0401
 
 
@@ -27,8 +27,6 @@ def map_ids(ids, from_type, to_type, as_series=False, **kwargs):
 
 
 def map_frame(df, from_type, to_type, **kwargs):
-    # TODO: warn if empty?
-
     # Fetch mapping.
     mapping = get_map(from_type, to_type, **kwargs)
     mapping = mapping.set_index(mapping.columns[0])[mapping.columns[1]]
@@ -42,3 +40,7 @@ def map_frame(df, from_type, to_type, **kwargs):
     mapped.index = mapping
 
     return mapped
+
+
+def get_map(from_type, to_type, **kwargs):
+    return ensembl.get_map(from_type=from_type, to_type=to_type, **kwargs)

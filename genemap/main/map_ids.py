@@ -7,8 +7,8 @@ import argparse
 from itertools import chain
 
 # pylint: disable=E0401,W0406
-from .. import ensembl
 from ..mapping import map_ids
+from ._base import add_ensembl_options
 # pylint: enable=E0401
 
 
@@ -25,30 +25,12 @@ def add_argparser(subparsers):
     # Add gene id list.
     parser.add_argument('gene_id', nargs='*')
 
+    # Option to print as map.
+    parser.add_argument('--as_map', default=False, action='store_true')
+
     parser.set_defaults(main=main)
 
     return parser
-
-
-def add_ensembl_options(parser):
-    # Add from/to type options.
-    parser.add_argument('--from_type', required=True)
-    parser.add_argument('--to_type', required=True)
-
-    # Add from/to organism options.
-    parser.add_argument('--from_organism', default='hsapiens')
-    parser.add_argument('--to_organism', default=None)
-
-    # Add version specification.
-    parser.add_argument('--ensembl_version', default='current',
-                        choices=ensembl.available_versions())
-
-    # Add print and cache options.
-    parser.add_argument('--as_map', default=False, action='store_true')
-    parser.add_argument('--no_cache', default=False, action='store_true')
-
-    return parser
-
 
 def main(args):
     # Try to get gene ids.

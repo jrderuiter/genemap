@@ -25,6 +25,7 @@ def add_argparser(subparsers):
 
     return parser
 
+
 def main(args):
     # Read frame.
     df = pd.read_csv(args.input, sep='\t', comment='#', index_col=0)

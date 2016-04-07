@@ -5,7 +5,7 @@ from builtins import *
 
 import argparse
 
-from . import map_ids, map_frame
+from . import map_ids, map_frame, get_map
 
 
 def main():
@@ -17,6 +17,7 @@ def main():
     # Setup id argument parser.
     map_ids.add_argparser(subparsers)
     map_frame.add_argparser(subparsers)
+    get_map.add_argparser(subparsers)
 
     # Parse arguments and dispatch.
     args = parser.parse_args()

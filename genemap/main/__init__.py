@@ -15,9 +15,9 @@ def main():
     subparsers.required = True
 
     # Setup id argument parser.
-    map_ids.add_argparser(subparsers)
-    map_frame.add_argparser(subparsers)
-    get_map.add_argparser(subparsers)
+    map_ids.register(subparsers)
+    map_frame.register(subparsers)
+    get_map.register(subparsers)
 
     # Parse arguments and dispatch.
     args = parser.parse_args()

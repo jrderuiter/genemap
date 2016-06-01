@@ -6,7 +6,7 @@ from builtins import *
 import pandas as pd
 
 # pylint: disable=E0401
-from . import ensembl
+from .registry import get_mapper
 # pylint: enable=E0401
 
 
@@ -42,5 +42,6 @@ def map_frame(df, from_type, to_type, **kwargs):
     return mapped
 
 
-def get_map(from_type, to_type, **kwargs):
-    return ensembl.get_map(from_type=from_type, to_type=to_type, **kwargs)
+def get_map(from_type, to_type, mapper, **kwargs):
+    map_func = get_mapper(name=mapper)
+    return map_func(from_type, to_type, **kwargs)

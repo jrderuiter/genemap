@@ -6,45 +6,60 @@ from builtins import *
 import argparse
 from itertools import chain
 
-# pylint: disable=E0401,W0406
-from ..mapping import map_ids
-from ._base import add_ensembl_options
-# pylint: enable=E0401
+from genemap.mapping import map_ids
+from genemap.mapping.registry import available_mappers, get_mapper_options
 
 
-def add_argparser(subparsers):
+def register(subparsers):
     parser = subparsers.add_parser('map_ids')
+    
+    mapper_subparser = parser.add_subparsers(dest='mapper')
+    mapper_subparser.required = True
 
-    # Add default options.
-    add_ensembl_options(parser)
+    for mapper_name in available_mappers():
+        # Create mapper parser.
+        mapper_parser = mapper_subparser.add_parser(mapper_name)
 
-    # Add i/o options.
-    parser.add_argument('--input', type=argparse.FileType('r'))
-    parser.add_argument('--output', default=None)
+        # Add default options.
+        mapper_parser.add_argument('--from_type', required=True)
+        mapper_parser.add_argument('--to_type', required=True)
 
-    # Add gene id list.
-    parser.add_argument('gene_id', nargs='*')
+        # Add i/o options.
+        mapper_parser.add_argument('--input', type=argparse.FileType('r'))
+        mapper_parser.add_argument('--output', default=None)
 
-    # Option to print as map.
-    parser.add_argument('--as_map', default=False, action='store_true')
+        # Add gene id list.
+        mapper_parser.add_argument('gene_id', nargs='*')
+
+        # Option to print as map.
+        mapper_parser.add_argument('--as_map', default=False,
+                                   action='store_true')
+
+        # Add mapper specific options.
+        opt_func = get_mapper_options(mapper_name)
+        opt_func(mapper_parser)
 
     parser.set_defaults(main=main)
 
     return parser
 
+
 def main(args):
-    # Try to get gene ids.
+    # Try to get gene ids from arguments.
     try:
         gene_ids = _get_gene_ids(args)
     except ValueError:
         raise ValueError('Either --input or gene_ids options must be provided')
 
-    # Perform the actual mapping.
-    mapped = map_ids(gene_ids, from_type=args.from_type, to_type=args.to_type,
-                     from_org=args.from_organism, to_org=args.to_organism,
-                     drop_duplicates='from', cache=not args.no_cache,
-                     version=args.ensembl_version, as_series=True)
+    # Extract kwargs from args.
+    kwargs = {k: v for k, v in vars(args).items()
+              if k not in {'main', 'command', 'input', 'output',
+                           'gene_id', 'as_map'}}
 
+    # Perform the actual mapping.
+    mapped = map_ids(gene_ids, as_series=True, **kwargs)
+
+    # Print/write output.
     if args.as_map:
         # Print as map (from --> to).
         _print_map(mapped.reset_index(), file_path=args.output)

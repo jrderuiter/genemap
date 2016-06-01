@@ -6,10 +6,11 @@ from builtins import *
 import numpy as np
 import pandas as pd
 
-# pylint: disable=E0401
 import pybiomart
 
-from .util import drop_duplicates as drop_duplicates_
+# pylint: disable=E0401
+from ..registry import mapper
+from ..util import drop_duplicates as drop_duplicates_
 # pylint: enable=E0401
 
 
@@ -71,19 +72,41 @@ def available_aliases(version='current'):
 
 # --- Map retrieval functions --- #
 
-def get_map(from_type, to_type, from_org='hsapiens', to_org=None,
+def ensembl_options(parser):
+    # Add from/to organism options.
+    parser.add_argument('--from_organism', default='hsapiens')
+    parser.add_argument('--to_organism', default=None)
+
+    # Add version specification.
+    parser.add_argument('--version', default='current',
+                        choices=available_versions())
+
+    # Extra options.
+    parser.add_argument('--no_cache', dest='cache',
+                        default=True, action='store_false')
+
+    return parser
+
+
+@mapper(name='ensembl', option_func=ensembl_options)
+def get_map(from_type, to_type, from_organism='hsapiens', to_organism=None,
             version='current', drop_duplicates='both', drop_na=True,
             cache=True):
 
+    # Check we are actually mapping something.
+    if from_type == to_type:
+        if (to_organism is None or from_organism == to_organism):
+            raise ValueError('Cannot map between same id types '
+                             'within the same organism')
+
     # Get mapping.
-    if to_org is None:
+    if to_organism is None:
         mapping = _id_map(from_type=from_type, to_type=to_type,
-                          version=version, organism=from_org, cache=cache)
+                          version=version, organism=from_organism, cache=cache)
     else:
-        mapping = _id_homology_map(from_org=from_org, to_org=to_org,
+        mapping = _id_homology_map(from_org=from_organism, to_org=to_organism,
                                    from_type=from_type, to_type=to_type,
                                    version='current', cache=True)
-
     # Handle NAs.
     if drop_na:
         mapping = mapping.dropna()

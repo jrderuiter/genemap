@@ -5,21 +5,31 @@ from builtins import *
 
 import pandas as pd
 
-# pylint: disable=E0401
-from ..mapping import map_frame
-from .map_ids import add_ensembl_options
-# pylint: enable=E0401
+from genemap.mapping import map_frame
+from genemap.mapping.registry import available_mappers, get_mapper_options
 
 
-def add_argparser(subparsers):
+def register(subparsers):
     parser = subparsers.add_parser('map_frame')
 
-    # Add default options.
-    add_ensembl_options(parser)
+    mapper_subparser = parser.add_subparsers(dest='mapper')
+    mapper_subparser.required = True
 
-    # Add i/o options.
-    parser.add_argument('--input', required=True)
-    parser.add_argument('--output', default=None)
+    for mapper_name in available_mappers():
+        # Create mapper parser.
+        mapper_parser = mapper_subparser.add_parser(mapper_name)
+
+        # Add default options.
+        mapper_parser.add_argument('--from_type', required=True)
+        mapper_parser.add_argument('--to_type', required=True)
+
+        # Add i/o options.
+        mapper_parser.add_argument('input')
+        mapper_parser.add_argument('output')
+
+        # Add mapper specific options.
+        opt_func = get_mapper_options(mapper_name)
+        opt_func(mapper_parser)
 
     parser.set_defaults(main=main)
 
@@ -30,9 +40,10 @@ def main(args):
     # Read frame.
     df = pd.read_csv(args.input, sep='\t', comment='#', index_col=0)
 
-    mapped = map_frame(df, from_type=args.from_type, to_type=args.to_type,
-                       from_org=args.from_organism, to_org=args.to_organism,
-                       drop_duplicates='from', cache=not args.no_cache,
-                       version=args.ensembl_version)
+    # Extract kwargs from args.
+    kwargs = {k: v for k, v in vars(args).items()
+              if k not in {'main', 'command', 'input', 'output'}}
 
+    # Perform the actual mapping and write output.
+    mapped = map_frame(df, **kwargs)
     mapped.to_csv(args.output, sep='\t', index=True)

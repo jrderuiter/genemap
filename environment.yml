@@ -1,10 +1,19 @@
-name: genemap
+name: genemap-dev
 dependencies:
+    # Required dependencies.
     - python=3.5
     - future
     - pandas
     - requests
+
+    # Testing dependencies.
+    - pytest
+
     - pip:
+        # Required dependencies.
         - requests_cache
         - git+https://github.com/jrderuiter/pybiomart.git
         - git+https://github.com/jrderuiter/genemap.git
+
+        # Testing dependencies.
+        - pytest-cov

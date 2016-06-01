@@ -3,20 +3,29 @@ from __future__ import absolute_import, division, print_function
 from builtins import *
 # pylint: enable=W0622,W0401,W0614
 
-# pylint: disable=E0401,W0406
-from ..mapping import get_map
-from ._base import add_ensembl_options
-# pylint: enable=E0401
+from genemap.mapping import get_map
+from genemap.mapping.registry import available_mappers, get_mapper_options
 
 
-def add_argparser(subparsers):
+def register(subparsers):
     parser = subparsers.add_parser('get_map')
 
-    # Add default options.
-    add_ensembl_options(parser)
+    mapper_subparser = parser.add_subparsers(dest='mapper')
+    mapper_subparser.required = True
 
-    # Add i/o options.
-    parser.add_argument('output')
+    for mapper_name in available_mappers():
+        # Create mapper parser.
+        mapper_parser = mapper_subparser.add_parser(mapper_name)
+
+        # Add default options.
+        mapper_parser.add_argument('--from_type', required=True)
+        mapper_parser.add_argument('--to_type', required=True)
+
+        mapper_parser.add_argument('output')
+
+        # Add mapper specific options.
+        opt_func = get_mapper_options(mapper_name)
+        opt_func(mapper_parser)
 
     parser.set_defaults(main=main)
 
@@ -24,11 +33,10 @@ def add_argparser(subparsers):
 
 
 def main(args):
-    # Get the mapping
-    mapping = get_map(from_type=args.from_type, to_type=args.to_type,
-                       from_org=args.from_organism, to_org=args.to_organism,
-                       drop_duplicates='from', cache=not args.no_cache,
-                       version=args.ensembl_version)
+    # Extract kwargs from args.
+    kwargs = {k: v for k, v in vars(args).items()
+              if k not in {'main', 'command', 'output'}}
 
-    # Write mapping.
+    # Fetch and write mapping.
+    mapping = get_map(**kwargs)
     mapping.to_csv(args.output, sep='\t', index=False)

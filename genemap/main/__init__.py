@@ -4,8 +4,9 @@ from builtins import *
 # pylint: enable=W0622,W0401,W0614
 
 import argparse
+import logging
 
-from . import map_ids, map_frame, get_map
+from . import get_map
 
 
 def main():
@@ -15,8 +16,6 @@ def main():
     subparsers.required = True
 
     # Setup id argument parser.
-    map_ids.register(subparsers)
-    map_frame.register(subparsers)
     get_map.register(subparsers)
 
     # Parse arguments and dispatch.

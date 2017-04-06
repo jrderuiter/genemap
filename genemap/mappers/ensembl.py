@@ -4,17 +4,17 @@ import pybiomart
 
 from .base import Mapper, register_mapper
 
-ENSEMBL_HOSTS = {
-    'current': 'ensembl.org',
-    # 80: 'may2015.archive.ensembl.org', Empty datasets?
-    '79': 'mar2015.archive.ensembl.org',
-    '78': 'dec2014.archive.ensembl.org',
-    '77': 'oct2014.archive.ensembl.org',
-    '76': 'aug2014.archive.ensembl.org',
-    '75': 'feb2014.archive.ensembl.org',
-    '74': 'dec2013.archive.ensembl.org',
-    '67': 'may2012.archive.ensembl.org'
-}
+# ENSEMBL_HOSTS = {
+#     'current': 'ensembl.org',
+#     # 80: 'may2015.archive.ensembl.org', Empty datasets?
+#     '79': 'mar2015.archive.ensembl.org',
+#     '78': 'dec2014.archive.ensembl.org',
+#     '77': 'oct2014.archive.ensembl.org',
+#     '76': 'aug2014.archive.ensembl.org',
+#     '75': 'feb2014.archive.ensembl.org',
+#     '74': 'dec2013.archive.ensembl.org',
+#     '67': 'may2012.archive.ensembl.org'
+# }
 
 ID_ALIASES = {
     'symbol': 'external_gene_name',
@@ -22,19 +22,8 @@ ID_ALIASES = {
     'ensembl': 'ensembl_gene_id'
 }
 
-ID_ALIASES_PRE_76 = dict(ID_ALIASES)
-ID_ALIASES_PRE_76.update({'symbol': 'external_gene_id'})
-
-ENSEMBL_ALIASES = {
-    'current': ID_ALIASES,
-    '79': ID_ALIASES,
-    '78': ID_ALIASES,
-    '77': ID_ALIASES,
-    '76': ID_ALIASES,
-    '75': ID_ALIASES_PRE_76,
-    '74': ID_ALIASES_PRE_76,
-    '67': ID_ALIASES_PRE_76
-}
+# ID_ALIASES_PRE_76 = dict(ID_ALIASES)
+# ID_ALIASES_PRE_76.update({'symbol': 'external_gene_id'})
 
 
 class EnsemblMapper(Mapper):
@@ -46,7 +35,7 @@ class EnsemblMapper(Mapper):
                  drop_duplicates='both',
                  from_organism='hsapiens',
                  to_organism=None,
-                 version='current'):
+                 host='ensembl.org'):
         super().__init__(
             from_type=from_type,
             to_type=to_type,
@@ -54,15 +43,13 @@ class EnsemblMapper(Mapper):
 
         self._from_organism = from_organism
         self._to_organism = to_organism
-        self._version = version
+        self._host = host
 
     @classmethod
     def configure_args(cls, parser):
         super().configure_args(parser)
         parser.add_argument('--from_organism', default='hsapiens')
         parser.add_argument('--to_organism', default=None)
-        parser.add_argument(
-            '--version', default='current', choices=cls.available_versions())
 
     @classmethod
     def parse_args(cls, args):
@@ -78,17 +65,7 @@ class EnsemblMapper(Mapper):
             self._to_type,
             from_organism=self._from_organism,
             to_organism=self._to_organism,
-            version=self._version)
-
-    @staticmethod
-    def available_versions():
-        """ List the available versions.
-
-        Returns:
-            List[str]: List of available versions.
-
-        """
-        return sorted(ENSEMBL_HOSTS.keys())
+            host=self._host)
 
     def available_aliases(self):
         """ Return the available aliases for gene ids.
@@ -97,7 +74,7 @@ class EnsemblMapper(Mapper):
             Dict[str,str]: Dict of aliases.
 
         """
-        return ENSEMBL_ALIASES[self._version]
+        return dict(ID_ALIASES)
 
 
 register_mapper('ensembl', EnsemblMapper)
@@ -105,9 +82,9 @@ register_mapper('ensembl', EnsemblMapper)
 
 def _fetch_map(from_type,
                to_type,
+               host,
                from_organism='hsapiens',
                to_organism=None,
-               version='current',
                cache=True):
     """Fetches ensembl map."""
 
@@ -122,7 +99,7 @@ def _fetch_map(from_type,
         mapping = _id_map(
             from_type=from_type,
             to_type=to_type,
-            version=version,
+            host=host,
             organism=from_organism,
             cache=cache)
     else:
@@ -131,26 +108,20 @@ def _fetch_map(from_type,
             to_org=to_organism,
             from_type=from_type,
             to_type=to_type,
-            version='current',
+            host=host,
             cache=True)
 
     return mapping
 
 
-def _id_map(from_type,
-            to_type,
-            version='current',
-            organism='hsapiens',
-            cache=True):
+def _id_map(from_type, to_type, host, organism='hsapiens', cache=True):
     # Try to lookup column as alias.
-    from_column = ENSEMBL_ALIASES[version].get(from_type, from_type)
-    to_column = ENSEMBL_ALIASES[version].get(to_type, to_type)
+    from_column = ID_ALIASES.get(from_type, from_type)
+    to_column = ID_ALIASES.get(to_type, to_type)
 
     # Get map_frame from Ensembl.
     dataset = pybiomart.Dataset(
-        host=ENSEMBL_HOSTS[version],
-        name=organism + '_gene_ensembl',
-        use_cache=cache)
+        host=host, name=organism + '_gene_ensembl', use_cache=cache)
 
     map_frame = dataset.query(attributes=[from_column, to_column])
 
@@ -162,16 +133,14 @@ def _id_map(from_type,
     return _convert_to_str(map_frame)
 
 
-def _homology_map(from_org, to_org, version='current', cache=True):
+def _homology_map(from_org, to_org, host, cache=True):
     # Determine column names for version.
     from_column = 'ensembl_gene_id'
     to_column = to_org + '_homolog_ensembl_gene'
 
     # Get map_frame from Ensembl.
     dataset = pybiomart.Dataset(
-        host=ENSEMBL_HOSTS[version],
-        name=from_org + '_gene_ensembl',
-        use_cache=cache)
+        host=host, name=from_org + '_gene_ensembl', use_cache=cache)
     map_frame = dataset.query(attributes=[from_column, to_column])
 
     # Override map names to reflect requested types.
@@ -182,12 +151,7 @@ def _homology_map(from_org, to_org, version='current', cache=True):
     return _convert_to_str(map_frame)
 
 
-def _id_homology_map(from_type,
-                     to_type,
-                     from_org,
-                     to_org,
-                     version='current',
-                     cache=True):
+def _id_homology_map(from_type, to_type, from_org, to_org, host, cache=True):
 
     # Get 'from' map.
     if from_type != 'ensembl':
@@ -195,14 +159,13 @@ def _id_homology_map(from_type,
             from_type=from_type,
             to_type='ensembl',
             organism=from_org,
-            version=version,
+            host=host,
             cache=cache)
     else:
         from_map = None
 
     # Get 'homology' map.
-    homology_map = _homology_map(
-        from_org, to_org, version=version, cache=cache)
+    homology_map = _homology_map(from_org, to_org, host=host, cache=cache)
 
     # Get 'to' map.
     if to_type != 'ensembl':
@@ -210,7 +173,7 @@ def _id_homology_map(from_type,
             from_type='ensembl',
             to_type=to_type,
             organism=to_org,
-            version=version,
+            host=host,
             cache=cache)
     else:
         to_map = None

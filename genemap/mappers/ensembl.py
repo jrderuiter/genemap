@@ -41,19 +41,25 @@ class EnsemblMapper(Mapper):
     """Ensembl mapper class."""
 
     def __init__(self,
-                 organism='hsapiens',
+                 from_type,
+                 to_type,
+                 drop_duplicates='both',
+                 from_organism='hsapiens',
                  to_organism=None,
                  version='current'):
-        super().__init__()
+        super().__init__(
+            from_type=from_type,
+            to_type=to_type,
+            drop_duplicates=drop_duplicates)
 
-        self._organism = organism
+        self._from_organism = from_organism
         self._to_organism = to_organism
         self._version = version
 
     @classmethod
     def configure_args(cls, parser):
         super().configure_args(parser)
-        parser.add_argument('--organism', default='hsapiens')
+        parser.add_argument('--from_organism', default='hsapiens')
         parser.add_argument('--to_organism', default=None)
         parser.add_argument(
             '--version', default='current', choices=cls.available_versions())
@@ -61,16 +67,16 @@ class EnsemblMapper(Mapper):
     @classmethod
     def parse_args(cls, args):
         return {
-            'organism': args.organism,
+            'from_organism': args.from_organism,
             'to_organism': args.to_organism,
             'version': args.version
         }
 
-    def _fetch_map(self, from_type, to_type):
-        return get_map(
-            from_type,
-            to_type,
-            from_organism=self._organism,
+    def _fetch_map(self):
+        return _fetch_map(
+            self._from_type,
+            self._to_type,
+            from_organism=self._from_organism,
             to_organism=self._to_organism,
             version=self._version)
 
@@ -97,16 +103,17 @@ class EnsemblMapper(Mapper):
 register_mapper('ensembl', EnsemblMapper)
 
 
-def get_map(from_type,
-            to_type,
-            from_organism='hsapiens',
-            to_organism=None,
-            version='current',
-            cache=True):
+def _fetch_map(from_type,
+               to_type,
+               from_organism='hsapiens',
+               to_organism=None,
+               version='current',
+               cache=True):
+    """Fetches ensembl map."""
 
     # Check we are actually mapping something.
     if from_type == to_type:
-        if (to_organism is None or from_organism == to_organism):
+        if to_organism is None or from_organism == to_organism:
             raise ValueError('Cannot map between same id types '
                              'within the same organism')
 

@@ -6,17 +6,21 @@ from builtins import *
 from functools import reduce
 
 
-def drop_duplicates(mapping, how='from'):
+def drop_duplicates(mapping, how='both'):
     # Determine which columns to consider for duplicates.
     if how == 'none':
         return mapping
-    if how == 'from':
+    if how == 'otm':
         columns = [mapping.columns[0]]
+    elif how == 'mto':
+        columns = [mapping.colums[1]]
     elif how == 'both':
         columns = [mapping.columns[0], mapping.columns[1]]
     else:
-        raise ValueError(('Unknown value for from ({}), '
-                          'should be either "from" or "both"').format(how))
+        raise ValueError(('Unknown value for how ({}). Possible values are '
+                          '\'none\', \'otm\' (one-to-many), \'mto\' '
+                          '(many-to-one) or \'both\'').format(how))
+
     # Apply column masks.
     masks = [_duplicate_mask(mapping, c) for c in columns]
     mask = reduce(lambda m1, m2: m1 | m2, masks)

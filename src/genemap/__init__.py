@@ -56,3 +56,15 @@ def map_dataframe(df,
         **kwargs)
 
     return mapper_obj.map_dataframe(df)
+
+
+def fetch_map(mapper, from_type, to_type, drop_duplicates='both', **kwargs):
+    """Fetches map used by given mapper."""
+
+    mapper_obj = _build_mapper(
+        mapper=mapper,
+        from_type=from_type,
+        to_type=to_type,
+        drop_duplicates=drop_duplicates,
+        **kwargs)
+    return mapper_obj.mapping

@@ -8,7 +8,7 @@ to the appropriate subcommands.
 
 import argparse
 
-from . import map_ids, map_dataframe, get_map
+from . import map_ids, map_dataframe, fetch_map
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
     # Configure subcommands.
     map_ids.configure_subparser(subparser)
     map_dataframe.configure_subparser(subparser)
-    get_map.configure_subparser(subparser)
+    fetch_map.configure_subparser(subparser)
 
     # Distpatch.
     args = parser.parse_args()

@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
+# pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import
 from __future__ import absolute_import, division, print_function
-# pylint: disable=W0622,W0401,W0614
 from builtins import *
-# pylint: enable=W0622,W0401,W0614
+# pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
 
 from functools import reduce
 

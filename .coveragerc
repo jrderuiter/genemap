@@ -1,5 +1,5 @@
 [run]
-source = genemap
+source = src/genemap
 
 [report]
-omit = genemap/main/*.py,genemap/_version.py
+omit = src/genemap/main/*.py

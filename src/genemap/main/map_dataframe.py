@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
+
+# pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import
 from __future__ import absolute_import, division, print_function
-# pylint: disable=W0622,W0401,W0614
 from builtins import *
-# pylint: enable=W0622,W0401,W0614
+# pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
 
 import pandas as pd
 
-from genemap.mapping import map_frame
+from genemap import map_dataframe
 from genemap.mapping.registry import available_mappers, get_mapper_options
 
 
@@ -41,8 +43,11 @@ def main(args):
     df = pd.read_csv(args.input, sep='\t', comment='#', index_col=0)
 
     # Extract kwargs from args.
-    kwargs = {k: v for k, v in vars(args).items()
-              if k not in {'main', 'command', 'input', 'output'}}
+    kwargs = {
+        k: v
+        for k, v in vars(args).items()
+        if k not in {'main', 'command', 'input', 'output'}
+    }
 
     # Perform the actual mapping and write output.
     mapped = map_frame(df, **kwargs)

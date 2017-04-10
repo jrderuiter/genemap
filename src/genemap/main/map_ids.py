@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
+# pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import
 from __future__ import absolute_import, division, print_function
-# pylint: disable=W0622,W0401,W0614
 from builtins import *
-# pylint: enable=W0622,W0401,W0614
+# pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
 
 import argparse
 from itertools import chain
@@ -12,7 +14,7 @@ from genemap.mapping.registry import available_mappers, get_mapper_options
 
 def register(subparsers):
     parser = subparsers.add_parser('map_ids')
-    
+
     mapper_subparser = parser.add_subparsers(dest='mapper')
     mapper_subparser.required = True
 
@@ -32,8 +34,8 @@ def register(subparsers):
         mapper_parser.add_argument('gene_id', nargs='*')
 
         # Option to print as map.
-        mapper_parser.add_argument('--as_map', default=False,
-                                   action='store_true')
+        mapper_parser.add_argument(
+            '--as_map', default=False, action='store_true')
 
         # Add mapper specific options.
         opt_func = get_mapper_options(mapper_name)
@@ -52,9 +54,12 @@ def main(args):
         raise ValueError('Either --input or gene_ids options must be provided')
 
     # Extract kwargs from args.
-    kwargs = {k: v for k, v in vars(args).items()
-              if k not in {'main', 'command', 'input', 'output',
-                           'gene_id', 'as_map'}}
+    kwargs = {
+        k: v
+        for k, v in vars(args).items()
+        if k not in
+        {'main', 'command', 'input', 'output', 'gene_id', 'as_map'}
+    }
 
     # Perform the actual mapping.
     mapped = map_ids(gene_ids, as_series=True, **kwargs)

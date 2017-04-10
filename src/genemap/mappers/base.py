@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+
+# pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import
+from __future__ import absolute_import, division, print_function
+from builtins import *
+# pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
+
 import pandas as pd
 
 from . import util
@@ -65,8 +72,14 @@ class Mapper(object):
         from_col, to_col = mapping.columns
         lookup = mapping.set_index(from_col)[to_col]
 
-        mapped = lookup.loc[ids]
-        return list(mapped.where((pd.notnull(mapped)), None))
+        try:
+            mapped = lookup.loc[ids]
+            mapped = list(mapped.where((pd.notnull(mapped)), None))
+        except KeyError:
+            # None of the ids are in the index.
+            mapped = [None] * len(ids)
+
+        return mapped
 
     def map_dataframe(self, df):
         """Maps index of a dataframe to new values."""
@@ -81,6 +94,8 @@ class Mapper(object):
             mapping.rename(columns={from_col: index_name}),
             on=index_name,
             how='left')
-        mapped = mapped.set_index(to_col)
+
+        mapped = (mapped.dropna(subset=[to_col]).set_index(to_col).drop(
+            index_name, axis=1))
 
         return mapped

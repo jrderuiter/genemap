@@ -1,27 +1,33 @@
+# -*- coding: utf-8 -*-
+
+# pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import
 from __future__ import absolute_import, division, print_function
-# pylint: disable=W0622,W0401,W0614
 from builtins import *
-# pylint: enable=W0622,W0401,W0614
+# pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
 
 import pytest
 
 import pandas as pd
 
 # pylint: disable=E0401
-from ..util import drop_duplicates
+from genemap.mappers.util import drop_duplicates
 # pylint: enable=E0401
 
 
 @pytest.fixture()
 def mapping():
     """Example mapping."""
-    return pd.DataFrame({'from': ['a', 'b', 'c', 'c', 'd'],
-                         'to': ['1', '1', '2', '3', '4']})
+    return pd.DataFrame({
+        'from': ['a', 'b', 'c', 'c', 'd'],
+        'to': ['1', '1', '2', '3', '4']
+    })
 
 
 # pylint: disable=R0201,W0621
 class TestDropDuplicates(object):
-    """Tests drop duplicates."""
+    """Unit tests for the drop_duplicates function."""
+
+    # TODO: add mto test.
 
     def test_none(self, mapping):
         """Test no dropping."""
@@ -29,10 +35,10 @@ class TestDropDuplicates(object):
         deduped = drop_duplicates(mapping, how='none')
         assert list(mapping.index) == list(deduped.index)
 
-    def test_from(self, mapping):
+    def test_otm(self, mapping):
         """Test dropping with from column."""
 
-        deduped = drop_duplicates(mapping, how='from')
+        deduped = drop_duplicates(mapping, how='otm')
         assert list(deduped['from']) == ['a', 'b', 'd']
 
     def test_both(self, mapping):

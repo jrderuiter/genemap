@@ -1,20 +1,19 @@
-.. Genemap documentation master file, created by
-   sphinx-quickstart on Mon Apr 10 11:01:49 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Genemap
+=======
 
-Welcome to Genemap's documentation!
-===================================
+Genemap is a simple python library for mapping gene identifiers between
+different identifier types and different species. This mapping is currently
+performed using Ensembl, though different mappers may be added in the
+future.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :hidden:
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   self
+   installation
+   usage
+   api
+   contributing
+   authors
+   history

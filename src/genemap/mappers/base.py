@@ -34,8 +34,10 @@ class Mapper(object):
         self._map = None
 
     @classmethod
-    def configure_args(cls, parser):
-        pass
+    def configure_parser(cls, parser):
+        parser.add_argument('--from_type', required=True)
+        parser.add_argument('--to_type', required=True)
+        parser.add_argument('--drop_duplicates', default='both')
 
     @classmethod
     def parse_args(cls, args):

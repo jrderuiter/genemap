@@ -1,25 +1,33 @@
-# -*- coding: utf-8 -*-
+"""Dispatcher script that redirects calls to subcommands.
 
-# pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import
-from __future__ import absolute_import, division, print_function
-from builtins import *
-# pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
+This script allows users to call subcommands from a single binary
+(``imfusion build ...`` instead of ``imfusion-build`` by redirecting calls to
+to the appropriate subcommands.
+
+"""
 
 import argparse
-import logging
 
-from . import get_map
+from . import map_ids, map_dataframe, get_map
 
 
 def main():
+    """Main function, parses the subcommand and executes the right script."""
+
+    # Setup main parser + subparser.
     parser = argparse.ArgumentParser()
+    subparser = parser.add_subparsers(dest='subcommand')
+    subparser.required = True
 
-    subparsers = parser.add_subparsers(dest='command')
-    subparsers.required = True
+    # Configure subcommands.
+    map_ids.configure_subparser(subparser)
+    map_dataframe.configure_subparser(subparser)
+    get_map.configure_subparser(subparser)
 
-    # Setup id argument parser.
-    get_map.register(subparsers)
-
-    # Parse arguments and dispatch.
+    # Distpatch.
     args = parser.parse_args()
     args.main(args)
+
+
+if __name__ == '__main__':
+    main()

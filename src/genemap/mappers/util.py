@@ -15,7 +15,7 @@ def drop_duplicates(mapping, how='both'):
     if how == 'otm':
         columns = [mapping.columns[0]]
     elif how == 'mto':
-        columns = [mapping.colums[1]]
+        columns = [mapping.columns[1]]
     elif how == 'both':
         columns = [mapping.columns[0], mapping.columns[1]]
     else:

@@ -5,23 +5,13 @@ from __future__ import absolute_import, division, print_function
 from builtins import *
 # pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
 
+import argparse
+
 import numpy as np
 import pandas as pd
 import pybiomart
 
 from .base import Mapper, register_mapper
-
-# ENSEMBL_HOSTS = {
-#     'current': 'ensembl.org',
-#     # 80: 'may2015.archive.ensembl.org', Empty datasets?
-#     '79': 'mar2015.archive.ensembl.org',
-#     '78': 'dec2014.archive.ensembl.org',
-#     '77': 'oct2014.archive.ensembl.org',
-#     '76': 'aug2014.archive.ensembl.org',
-#     '75': 'feb2014.archive.ensembl.org',
-#     '74': 'dec2013.archive.ensembl.org',
-#     '67': 'may2012.archive.ensembl.org'
-# }
 
 ID_ALIASES = {
     'symbol': 'external_gene_name',
@@ -29,12 +19,21 @@ ID_ALIASES = {
     'ensembl': 'ensembl_gene_id'
 }
 
-# ID_ALIASES_PRE_76 = dict(ID_ALIASES)
-# ID_ALIASES_PRE_76.update({'symbol': 'external_gene_id'})
-
 
 class EnsemblMapper(Mapper):
     """Ensembl mapper class."""
+
+    # 80: 'may2015.archive.ensembl.org', Empty datasets?
+    # '79': 'mar2015.archive.ensembl.org',
+    # '78': 'dec2014.archive.ensembl.org',
+    # '77': 'oct2014.archive.ensembl.org',
+    # '76': 'aug2014.archive.ensembl.org',
+    # '75': 'feb2014.archive.ensembl.org',
+    # '74': 'dec2013.archive.ensembl.org',
+    # '67': 'may2012.archive.ensembl.org'
+
+    # ID_ALIASES_PRE_76 = dict(ID_ALIASES)
+    # ID_ALIASES_PRE_76.update({'symbol': 'external_gene_id'})
 
     def __init__(self,
                  from_type,
@@ -42,7 +41,8 @@ class EnsemblMapper(Mapper):
                  drop_duplicates='both',
                  from_organism='hsapiens',
                  to_organism=None,
-                 host='ensembl.org'):
+                 host='ensembl.org',
+                 drop_lrg=True):
         super().__init__(
             from_type=from_type,
             to_type=to_type,
@@ -51,28 +51,33 @@ class EnsemblMapper(Mapper):
         self._from_organism = from_organism
         self._to_organism = to_organism
         self._host = host
+        self._drop_lrg = drop_lrg
 
     @classmethod
-    def configure_args(cls, parser):
-        super().configure_args(parser)
+    def configure_parser(cls, parser):
+        super().configure_parser(parser)
         parser.add_argument('--from_organism', default='hsapiens')
         parser.add_argument('--to_organism', default=None)
+        parser.add_argument('--host', default='ensembl.org')
 
     @classmethod
-    def parse_args(cls, args):
-        return {
-            'from_organism': args.from_organism,
-            'to_organism': args.to_organism,
-            'version': args.version
-        }
+    def from_args(cls, args):
+        return cls(from_type=args.from_type,
+                   to_type=args.to_type,
+                   from_organism=args.from_organism,
+                   to_organism=args.to_organism,
+                   host=args.host)
 
     def _fetch_map(self):
-        return _fetch_map(
+        mapping = _fetch_map(
             self._from_type,
             self._to_type,
             from_organism=self._from_organism,
             to_organism=self._to_organism,
-            host=self._host)
+            host=self._host,
+            drop_lrg=self._drop_lrg)
+
+        return mapping
 
     def available_aliases(self):
         """ Return the available aliases for gene ids.
@@ -92,7 +97,8 @@ def _fetch_map(from_type,
                host,
                from_organism='hsapiens',
                to_organism=None,
-               cache=True):
+               cache=True,
+               drop_lrg=True):
     """Fetches ensembl map."""
 
     # Check we are actually mapping something.
@@ -117,6 +123,17 @@ def _fetch_map(from_type,
             to_type=to_type,
             host=host,
             cache=True)
+
+    mapping = mapping.dropna()
+
+    # Hacky fix to avoid pulling along LRG entries together with the
+    # ENSEMBL ids, which we aren't interested in.
+    if to_type == 'ensembl' and drop_lrg:
+        mask = mapping[mapping.columns[1]].str.startswith('LRG_')
+        mapping = mapping.loc[~mask]
+    elif from_type == 'ensembl' and drop_lrg:
+        mask = mapping[mapping.columns[0]].str.startswith('LRG_')
+        mapping = mapping.loc[~mask]
 
     return mapping
 

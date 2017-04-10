@@ -29,7 +29,7 @@ setuptools.setup(
     packages=setuptools.find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
-    entry_points={'console_scripts': ['genemap = genemap.main:main', ]},
+    entry_points={'console_scripts': ['genemap = genemap.main:main']},
     install_requires=requirements,
     extras_require=extra_requirements,
     zip_safe=False,

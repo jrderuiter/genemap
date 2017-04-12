@@ -2,7 +2,7 @@
 API
 ===
 
-Unified interface
+General interface
 -----------------
 
 .. autofunction:: genemap.map_ids

@@ -13,6 +13,7 @@ future.
    self
    installation
    usage
+   command_line
    api
    contributing
    authors

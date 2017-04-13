@@ -58,7 +58,7 @@ class Mapper(object):
         """Maps given ids to new values."""
 
         # One to many mappings are not possible for lists.
-        if not self._drop_duplicates in {'both', 'from'}:
+        if not self._drop_duplicates in {'both', 'otm'}:
             raise ValueError(
                 'One to many mappings are not possible for lists. '
                 'Drop_duplicates should be either \'both\' or \'otm\', '

@@ -25,13 +25,9 @@ def get_mappers():
 class Mapper(object):
     """Base mapper class."""
 
-    def __init__(self, from_type, to_type, drop_duplicates='both'):
-
-        self._from_type = from_type
-        self._to_type = to_type
+    def __init__(self, drop_duplicates='both'):
+        self._mapping = None
         self._drop_duplicates = drop_duplicates
-
-        self._map = None
 
     @classmethod
     def configure_parser(cls, parser):
@@ -47,16 +43,15 @@ class Mapper(object):
     def from_args(cls, args):
         return cls(**cls.parse_args(args))
 
-    @property
-    def mapping(self):
+    def fetch_mapping(self):
         """Returns mapping used to map ids."""
 
-        if self._map is None:
-            self._map = self._fetch_map().dropna()
+        if self._mapping is None:
+            self._mapping = self._fetch_mapping().dropna()
 
-        return self._map
+        return self._mapping
 
-    def _fetch_map(self):
+    def _fetch_mapping(self):
         raise NotImplementedError()
 
     def map_ids(self, ids):
@@ -69,7 +64,8 @@ class Mapper(object):
                 'Drop_duplicates should be either \'both\' or \'otm\', '
                 'not \'none\' or \'mto\'.')
 
-        mapping = util.drop_duplicates(self.mapping, how=self._drop_duplicates)
+        mapping = self.fetch_mapping()
+        mapping = util.drop_duplicates(mapping, how=self._drop_duplicates)
 
         from_col, to_col = mapping.columns
         lookup = mapping.set_index(from_col)[to_col]
@@ -86,7 +82,8 @@ class Mapper(object):
     def map_dataframe(self, df):
         """Maps index of a dataframe to new values."""
 
-        mapping = util.drop_duplicates(self.mapping, how=self._drop_duplicates)
+        mapping = self.fetch_mapping()
+        mapping = util.drop_duplicates(mapping, how=self._drop_duplicates)
 
         index_name = df.index.name
         from_col, to_col = mapping.columns

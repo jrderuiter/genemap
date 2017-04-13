@@ -5,8 +5,6 @@ from __future__ import absolute_import, division, print_function
 from builtins import *
 # pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
 
-import argparse
-
 import numpy as np
 import pandas as pd
 import pybiomart
@@ -43,10 +41,10 @@ class EnsemblMapper(Mapper):
                  to_organism=None,
                  host='ensembl.org',
                  drop_lrg=True):
-        super().__init__(
-            from_type=from_type,
-            to_type=to_type,
-            drop_duplicates=drop_duplicates)
+        super().__init__(drop_duplicates=drop_duplicates)
+
+        self._from_type = from_type
+        self._to_type = to_type
 
         self._from_organism = from_organism
         self._to_organism = to_organism
@@ -68,7 +66,7 @@ class EnsemblMapper(Mapper):
                    to_organism=args.to_organism,
                    host=args.host)
 
-    def _fetch_map(self):
+    def _fetch_mapping(self):
         mapping = _fetch_map(
             self._from_type,
             self._to_type,

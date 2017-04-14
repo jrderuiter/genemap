@@ -5,6 +5,8 @@ from __future__ import absolute_import, division, print_function
 from builtins import *
 # pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
 
+from functools import reduce
+
 import pandas as pd
 
 from .base import Mapper, register_mapper
@@ -51,19 +53,14 @@ class ChainedMapper(Mapper):
         self._mappers = mappers
 
     def _fetch_mapping(self):
-        mapping = self._mappers[0].fetch_mapping()
+        def _chain_maps(df_a, df_b):
+            df_b = df_b.rename(columns={df_b.columns[0]: df_a.columns[1]})
+            merged = pd.merge(df_a, df_b, on=df_a.columns[1], how='inner')
+            return merged.iloc[:, [0, -1]]
 
-        for mapper in self._mappers[1:]:
-            prev_target = mapping.columns[-1]
-
-            new_mapping = mapper.fetch_mapping()
-            new_mapping = mapping.rename(
-                columns={new_mapping.columns[0]: prev_target})
-
-            mapping = pd.merge(
-                mapping, new_mapping, on=prev_target, how='left')
-
-        return mapping.iloc[:, [0, -1]]
+        mappings = (mapper.fetch_mapping() for mapper in self._mappers)
+        mapping = reduce(_chain_maps, mappings)
+        return mapping.drop_duplicates()
 
 
 register_mapper('chained', ChainedMapper)
@@ -89,48 +86,58 @@ class CombinedMapper(Mapper):
 
     """
 
-    def __init__(self, mappers, how='merge', drop_duplicates='both'):
+    def __init__(self, mappers, augment=False, drop_duplicates='both'):
         if len(mappers) < 2:
             raise ValueError('At least two mappers must be provided')
 
-        if how not in {'merge', 'augment'}:
-            raise ValueError('Unknown value for how ({}). Possible values '
-                             'are \'merge\' and \'augment\'.'.format(how))
-
         super().__init__(drop_duplicates=drop_duplicates)
         self._mappers = mappers
-        self._how = how
+        self._augment = augment
 
     def _fetch_mapping(self):
+        # Combine mappings, using column names from first dataframe.
         mappings = (mapper.fetch_mapping() for mapper in self._mappers)
 
-        if self._how == 'augment':
-            raise NotImplementedError()
-        elif self._how == 'merge':
-            mapping = self._merge_mappings(mappings)
+        if self._augment:
+            mapping = self._augment_mappings(mappings)
         else:
-            raise ValueError('Unknwon value for how')
+            mapping = self._merge_mappings(mappings)
 
         return mapping
 
     @staticmethod
     def _merge_mappings(mappings):
-        mappings = iter(mappings)
+        """Concats mappings, dropping only exact duplicates."""
 
-        # Fetch first map (used as example).
-        mapping = next(mappings)
+        mappings = _consolidate_column_names(mappings)
+        mapping = pd.concat(mappings, axis=0, ignore_index=False)
+        return mapping.drop_duplicates()
 
-        # Merge extra mappings.
-        for extra_mapping in mappings:
-            extra_mapping.columns = mapping.columns
+    @staticmethod
+    def _augment_mappings(mappings):
+        """Concats mappings, dropping overlaps (based on from column)."""
 
-            mapping = pd.concat(
-                [mapping, extra_mapping], axis=0, ignore_index=True)
+        def _augment_frame(df_a, df_b):
+            """Merges a and b, dropping overlaps from b (from column)."""
+            values_a = set(df_a.iloc[:, 0])
+            filt_b = df_b.loc[~df_b.iloc[:, 0].isin(values_a)]
+            return pd.concat([df_a, filt_b], axis=0, ignore_index=True)
 
-        # Remove any duplicates that were introduced.
-        mapping = mapping.drop_duplicates()
-
-        return mapping
+        mappings = _consolidate_column_names(mappings)
+        mapping = reduce(_augment_frame, mappings)
+        return mapping.drop_duplicates()
 
 
 register_mapper('combined', CombinedMapper)
+
+
+def _consolidate_column_names(dataframes):
+    """Returns dataframes with the same column names as the first dataframe."""
+
+    first = next(dataframes)
+    yield first
+
+    for df in dataframes:
+        df = df.copy()
+        df.columns = first.columns
+        yield df

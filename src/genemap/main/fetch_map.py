@@ -24,7 +24,9 @@ def configure_subparser(subparser):
     mapper_subparser = parser.add_subparsers(dest='mapper')
     mapper_subparser.required = True
 
-    for name, class_ in get_mappers().items():
+    mappers = get_mappers(with_command_line=True).items()
+
+    for name, class_ in mappers:
         mapper_parser = mapper_subparser.add_parser(name)
         class_.configure_parser(mapper_parser)
         mapper_parser.add_argument('output')

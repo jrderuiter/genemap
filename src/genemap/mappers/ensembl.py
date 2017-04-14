@@ -5,13 +5,11 @@ from __future__ import absolute_import, division, print_function
 from builtins import *
 # pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import
 
-import argparse
-
 import numpy as np
 import pandas as pd
 import pybiomart
 
-from .base import Mapper, register_mapper
+from .base import Mapper, CommandLineMixin, register_mapper
 
 ID_ALIASES = {
     'symbol': 'external_gene_name',
@@ -20,7 +18,7 @@ ID_ALIASES = {
 }
 
 
-class EnsemblMapper(Mapper):
+class EnsemblMapper(CommandLineMixin, Mapper):
     """Ensembl mapper class."""
 
     # 80: 'may2015.archive.ensembl.org', Empty datasets?
@@ -41,12 +39,12 @@ class EnsemblMapper(Mapper):
                  drop_duplicates='both',
                  from_organism='hsapiens',
                  to_organism=None,
-                 host='ensembl.org',
+                 host='http://ensembl.org',
                  drop_lrg=True):
-        super().__init__(
-            from_type=from_type,
-            to_type=to_type,
-            drop_duplicates=drop_duplicates)
+        super().__init__(drop_duplicates=drop_duplicates)
+
+        self._from_type = from_type
+        self._to_type = to_type
 
         self._from_organism = from_organism
         self._to_organism = to_organism
@@ -55,7 +53,6 @@ class EnsemblMapper(Mapper):
 
     @classmethod
     def configure_parser(cls, parser):
-        super().configure_parser(parser)
         parser.add_argument('--from_organism', default='hsapiens')
         parser.add_argument('--to_organism', default=None)
         parser.add_argument('--host', default='ensembl.org')
@@ -68,7 +65,7 @@ class EnsemblMapper(Mapper):
                    to_organism=args.to_organism,
                    host=args.host)
 
-    def _fetch_map(self):
+    def _fetch_mapping(self):
         mapping = _fetch_map(
             self._from_type,
             self._to_type,

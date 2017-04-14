@@ -41,6 +41,7 @@ class TestEnsemblMapperMapIds(object):
             host=HOST,
             from_organism='mmusculus')
         mapped = mapper.map_ids(['Trp53', 'Brca1'])
+
         assert mapped == ['ENSMUSG00000059552', 'ENSMUSG00000017146']
 
 

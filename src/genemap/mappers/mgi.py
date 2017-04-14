@@ -15,14 +15,15 @@ import pandas as pd
 import requests
 import requests_cache
 
-from .base import Mapper, register_mapper
+from .base import Mapper, CommandLineMixin, register_mapper
 
+ID_TYPES = {'symbol', 'entrez'}
 MAP_URL = 'http://www.informatics.jax.org/downloads/reports/HOM_AllOrganism.rpt'
 
 requests_cache.install_cache('.genemap')
 
 
-class MgiMapper(Mapper):
+class MgiMapper(CommandLineMixin, Mapper):
     """MGI mapper class"""
 
     def __init__(self,
@@ -46,6 +47,24 @@ class MgiMapper(Mapper):
         self._to_organism = to_organism
 
         self._map_url = map_url
+
+    @classmethod
+    def configure_parser(cls, parser):
+        parser.add_argument('--from_type', required=True, choices=ID_TYPES)
+        parser.add_argument('--to_type', required=True, choices=ID_TYPES)
+        parser.add_argument('--from_organism', default='mouse')
+        parser.add_argument('--to_organism', default=None)
+        parser.add_argument('--drop_duplicates', default='both')
+        parser.add_argument('--map_url', default=MAP_URL)
+
+    @classmethod
+    def from_args(cls, args):
+        return cls(from_type=args.from_type,
+                   to_type=args.to_type,
+                   from_organism=args.from_organism,
+                   to_organism=args.to_organism,
+                   drop_duplicates=args.drop_duplicates,
+                   map_url=args.map_url)
 
     def _fetch_mapping(self):
         # Fetch and read MGI data.
@@ -99,3 +118,6 @@ class MgiMapper(Mapper):
                                [self._from_type, self._to_type]]
 
         return mapping
+
+
+register_mapper('mgi', MgiMapper)

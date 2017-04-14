@@ -7,7 +7,7 @@ from builtins import *
 
 import pandas as pd
 
-from .base import Mapper
+from .base import Mapper, register_mapper
 
 
 class CustomMapper(Mapper):
@@ -26,6 +26,9 @@ class CustomMapper(Mapper):
 
     def _fetch_mapping(self):
         return self._map
+
+
+register_mapper('custom', CustomMapper)
 
 
 class ChainedMapper(Mapper):
@@ -60,7 +63,10 @@ class ChainedMapper(Mapper):
             mapping = pd.merge(
                 mapping, new_mapping, on=prev_target, how='left')
 
-        return mapping[[mapping.columns[0], mapping.columns[-1]]]
+        return mapping.iloc[:, [0, -1]]
+
+
+register_mapper('chained', ChainedMapper)
 
 
 class CombinedMapper(Mapper):
@@ -83,26 +89,48 @@ class CombinedMapper(Mapper):
 
     """
 
-    def __init__(self, mappers, drop_duplicates='both'):
+    def __init__(self, mappers, how='merge', drop_duplicates='both'):
         if len(mappers) < 2:
             raise ValueError('At least two mappers must be provided')
 
+        if how not in {'merge', 'augment'}:
+            raise ValueError('Unknown value for how ({}). Possible values '
+                             'are \'merge\' and \'augment\'.'.format(how))
+
         super().__init__(drop_duplicates=drop_duplicates)
         self._mappers = mappers
+        self._how = how
 
     def _fetch_mapping(self):
-        # Fetch first map (used as example).
-        mapping = self._mappers[0].fetch_mapping()
+        mappings = (mapper.fetch_mapping() for mapper in self._mappers)
 
-        # Merge additional mappings.
-        for mapper in self._mappers[1:]:
-            new_mapping = mapper.fetch_mapping()
-            new_mapping.columns = mapping.columns
+        if self._how == 'augment':
+            raise NotImplementedError()
+        elif self._how == 'merge':
+            mapping = self._merge_mappings(mappings)
+        else:
+            raise ValueError('Unknwon value for how')
+
+        return mapping
+
+    @staticmethod
+    def _merge_mappings(mappings):
+        mappings = iter(mappings)
+
+        # Fetch first map (used as example).
+        mapping = next(mappings)
+
+        # Merge extra mappings.
+        for extra_mapping in mappings:
+            extra_mapping.columns = mapping.columns
 
             mapping = pd.concat(
-                [mapping, new_mapping], axis=0, ignore_index=True)
+                [mapping, extra_mapping], axis=0, ignore_index=True)
 
         # Remove any duplicates that were introduced.
         mapping = mapping.drop_duplicates()
 
         return mapping
+
+
+register_mapper('combined', CombinedMapper)

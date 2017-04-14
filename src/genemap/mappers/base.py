@@ -10,16 +10,47 @@ import pandas as pd
 from . import util
 
 _registry = {}
+_cli_registry = {}
 
 
-def register_mapper(name, mapper):
-    """Registers a mapper class under given name."""
-    _registry[name] = mapper
+def register_mapper(name, mapper_class):
+    """Registers a mapper class under given name.
+
+    Parameters
+    ----------
+    name : str
+        Name to register mapper under.
+    mapper_class : Class[Mapper]
+        Mapper class to register.
+
+    """
+
+    _registry[name] = mapper_class
+
+    if issubclass(mapper_class, CommandLineMixin):
+        _cli_registry[name] = mapper_class
 
 
-def get_mappers():
-    """Returns dict of registered mapper classes."""
-    return dict(_registry)
+def get_mappers(with_command_line=False):
+    """Returns dict of registered mapper classes.
+
+    Parameters
+    ----------
+    with_command_line : bool
+        Whether to return all mappers (False) or only those with a command
+        line interface (True).
+
+    Returns
+    -------
+    Dict[str, Mapper]
+        Dictionary of registered Mapper classes.
+
+    """
+
+    if with_command_line:
+        return dict(_cli_registry)
+    else:
+        return dict(_registry)
 
 
 class Mapper(object):
@@ -28,20 +59,6 @@ class Mapper(object):
     def __init__(self, drop_duplicates='both'):
         self._mapping = None
         self._drop_duplicates = drop_duplicates
-
-    @classmethod
-    def configure_parser(cls, parser):
-        parser.add_argument('--from_type', required=True)
-        parser.add_argument('--to_type', required=True)
-        parser.add_argument('--drop_duplicates', default='both')
-
-    @classmethod
-    def parse_args(cls, args):
-        return {}
-
-    @classmethod
-    def from_args(cls, args):
-        return cls(**cls.parse_args(args))
 
     def fetch_mapping(self):
         """Returns mapping used to map ids."""
@@ -98,3 +115,17 @@ class Mapper(object):
             index_name, axis=1))
 
         return mapped
+
+
+class CommandLineMixin(object):
+    """Simple mixin that defines functions for mappers with CLI interfaces."""
+
+    @classmethod
+    def configure_parser(cls, parser):
+        """Configures an argparse Parser for parsing command line args."""
+        raise NotImplementedError()
+
+    @classmethod
+    def from_args(cls, args):
+        """Instantiates the mapper from the given parsed arguments."""
+        raise NotImplementedError()

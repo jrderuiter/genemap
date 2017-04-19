@@ -13,7 +13,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 # General requirements.
-requirements = ['future', 'pandas', 'pybiomart', 'requests_cache']
+requirements = ['future', 'pandas>=0.18.0', 'pybiomart', 'requests_cache']
 extra_requirements = {}
 
 setuptools.setup(

@@ -2,6 +2,11 @@
 Installation
 ============
 
+Requirements
+------------
+
+Genemap has been tested on Python 2.7 and 3.4+.
+
 Stable release
 --------------
 

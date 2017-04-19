@@ -15,15 +15,30 @@ from .base import Mapper, register_mapper
 class CustomMapper(Mapper):
     """Custom mapper class.
 
-    Maps idenifiers using a provided mapping.
+    Maps identifiers using a custom mapping provided by the user. The nature
+    of the performed mapping depends on the provided mapping table.
+
+    Parameters
+    ----------
+    mapping : pandas.DataFrame
+        Dataframe containing the mapping. Is expected to contain exactly two
+        columns, the first of which contains the source ID type, the second
+        of which contains the target ID type.
+    drop_duplicates : str
+        How to handle duplicates. If 'both', then entries with duplicates in
+        either the source/target columns are dropped from the mapping. If
+        'mto' (many-to-one), then only duplicates in the source column are
+        dropped. If 'otm', then only duplicates in the target column are
+        dropped. Finally, if 'none', no duplicates are removed from the mapping.
+
     """
 
-    def __init__(self, mapping):
+    def __init__(self, mapping, drop_duplicates='both'):
         if not mapping.shape[1] == 2:
             raise ValueError(
                 'Requires a dataframe containing exactly two columns')
 
-        super().__init__()
+        super().__init__(drop_duplicates=drop_duplicates)
         self._map = mapping
 
     def _fetch_mapping(self):
@@ -42,6 +57,13 @@ class ChainedMapper(Mapper):
     of the given mappers to provide a mapping from the ``to_type`` of the
     first mapper to the ``from_type`` of the last mapper. (In the two mapper
     example, this provides a mapping from a --> c).
+
+    Parameters
+    ----------
+    mappers : List[Mapper]
+        List of Mapper instances to chain.
+    drop_duplicates : str
+        How to handle duplicates in the mapping.
 
     """
 

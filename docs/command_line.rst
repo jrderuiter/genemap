@@ -1,10 +1,12 @@
+.. _command-line:
+
 ============
 Command line
 ============
 
 Genemaps main functions (``map_ids``, ``map_dataframe`` and
-``fetch_mapping``) are also accessible via the command line, each implemented
-in a specific subcommand. Examples for each subcommand are shown below.
+``fetch_mapping``) are also accessible via the command line. Each of these
+functions is implemented in its own subcommand. Examples are shown below.
 
 Mapping ids
 -----------

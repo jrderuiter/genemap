@@ -24,7 +24,33 @@ requests_cache.install_cache('.genemap')
 
 
 class MgiMapper(CommandLineMixin, Mapper):
-    """MGI mapper class"""
+    """MGI mapper class.
+
+    Maps IDs using the homology table provided by MGI. Supports mapping between
+    gene symbols and Entrez identifers and between several specifies
+    (using orthologous genes).
+
+    Parameters
+    ----------
+    from_type : str
+        The source identifier type. Can be either 'symbol' or 'entrez'.
+    to_type : str
+        The target identifier type (see ``from_type`` for more details).
+    drop_duplicates : str
+        How to handle duplicates. If 'both', then entries with duplicates in
+        either the source/target columns are dropped from the mapping. If
+        'mto' (many-to-one), then only duplicates in the source column are
+        dropped. If 'otm', then only duplicates in the target column are
+        dropped. Finally, if 'none', no duplicates are removed from the mapping.
+    from_organism : str
+        Name of the source organism.
+    to_organism : str
+        Name of the target organism. If not given, no mapping between
+        organisms is performed.
+    map_url : str
+        The URL to use to fetch the mapping table from MGI.
+
+    """
 
     def __init__(self,
                  from_type,

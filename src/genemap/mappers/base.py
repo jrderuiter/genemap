@@ -61,7 +61,21 @@ class Mapper(object):
         self._drop_duplicates = drop_duplicates
 
     def fetch_mapping(self):
-        """Returns mapping used to map ids."""
+        """Fetches mapping used to map ids.
+
+        Returns the mapping that is actually used to map the IDs. This is
+        is mainly useful if you are interested in the mapping itself or want
+        to perform more complicated mappings than are provided by the
+        ``map_ids`` and ``map_dataframe`` methods.
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame describing the used mapping. The DataFrame contains two
+            columns, the first of which contains the source idenfiers (from
+            which we map), whereas the second contains the target idenfiers
+            (to which we map).
+        """
 
         if self._mapping is None:
             self._mapping = self._fetch_mapping().dropna()
@@ -72,7 +86,19 @@ class Mapper(object):
         raise NotImplementedError()
 
     def map_ids(self, ids):
-        """Maps given ids to new values."""
+        """Maps a list of IDs to new values.
+
+        Parameters
+        ----------
+        ids : List[str]
+            List of IDs to map.
+
+        Returns
+        -------
+        List[str]
+            List of mapped IDs.
+
+        """
 
         # One to many mappings are not possible for lists.
         if not self._drop_duplicates in {'both', 'otm'}:
@@ -97,7 +123,20 @@ class Mapper(object):
         return mapped
 
     def map_dataframe(self, df):
-        """Maps index of a dataframe to new values."""
+        """Maps index of a dataframe to new values.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            DataFrame to map.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Mapped DataFrame in which the index values have been mapped
+            to a new identifier type.
+
+        """
 
         mapping = self.fetch_mapping()
         mapping = util.drop_duplicates(mapping, how=self._drop_duplicates)

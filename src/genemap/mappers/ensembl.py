@@ -19,7 +19,40 @@ ID_ALIASES = {
 
 
 class EnsemblMapper(CommandLineMixin, Mapper):
-    """Ensembl mapper class."""
+    """Ensembl mapper class.
+
+    Maps IDs using Ensembl (via its Biomart interface). As such, this mapper
+    can translate between gene ID types that are available via Ensembls
+    Biomart interface, as well as between the different species
+    available in Ensembl.
+
+    Parameters
+    ----------
+    from_type : str
+        The source identifier type. Can be the name of any identifier specified
+        in the Ensembl database or one of the available aliases (symbol,
+        entrez or ensembl).
+    to_type : str
+        The target identifier type (see ``from_type`` for more details).
+    drop_duplicates : str
+        How to handle duplicates. If 'both', then entries with duplicates in
+        either the source/target columns are dropped from the mapping. If
+        'mto' (many-to-one), then only duplicates in the source column are
+        dropped. If 'otm', then only duplicates in the target column are
+        dropped. Finally, if 'none', no duplicates are removed from the mapping.
+    from_organism : str
+        Name of the source organism.
+    to_organism : str
+        Name of the target organism. If not given, no mapping between
+        organisms is performed.
+    host : str
+        The URL to use for accessing Ensembls Biomart. Can be changed to access
+        Ensembls archived datasets.
+    drop_lrg : bool
+        Whether to drop gene entries starting with 'LRG' when mapping to/from
+        Ensembl IDs.
+
+    """
 
     # 80: 'may2015.archive.ensembl.org', Empty datasets?
     # '79': 'mar2015.archive.ensembl.org',

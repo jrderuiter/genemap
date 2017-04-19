@@ -18,7 +18,7 @@ def main(args):
 def configure_subparser(subparser):
     """Configures subparser for subcommand."""
 
-    parser = subparser.add_parser('fetch_map')
+    parser = subparser.add_parser('fetch_mapping')
     parser.set_defaults(main=main)
 
     mapper_subparser = parser.add_subparsers(dest='mapper')

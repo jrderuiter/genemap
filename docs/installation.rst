@@ -14,7 +14,7 @@ To install genemap, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install genemap
+    $ pip install https://github.com/jrderuiter/genemap/archive/0.2.0.tar.gz
 
 This is the preferred method to install genemap, as it will always install
 the most recent stable release.

@@ -3,7 +3,6 @@ language: python
 python:
     # We don't actually use the Travis Python, but this keeps it organized.
     - '2.7'
-    - '3.3'
     - '3.4'
     - '3.5'
 
@@ -21,15 +20,12 @@ install:
     - conda info -a
 
     # Create conda environment and install dependencies.
-    - conda create -q -n test python=$TRAVIS_PYTHON_VERSION future pandas requests
+    - conda create -q -n test python=$TRAVIS_PYTHON_VERSION
     - source activate test
-    - pip install .
+    - pip install .[dev]
 
-    # Install test dependencies.
-    - conda install pytest
-    - pip install pytest-cov python-coveralls
-
-script: py.test --cov genemap --cov-report term-missing
+script:
+    py.test --cov genemap --cov-report term-missing
 
 after_success:
     - coveralls

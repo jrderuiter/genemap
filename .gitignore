@@ -5,3 +5,7 @@ __pycache__
 .cache
 .coverage
 htmlcov
+docs/_build
+.genemap.sqlite
+.tox
+.vscode

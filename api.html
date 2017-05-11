@@ -1,0 +1,571 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API &mdash; Genemap 0.2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Genemap 0.2.0 documentation" href="index.html"/>
+        <link rel="next" title="Contributing" href="contributing.html"/>
+        <link rel="prev" title="Command line" href="command_line.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Genemap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Genemap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command_line.html">Command line</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#functional-interface">Functional interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mapper-classes">Mapper classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Genemap</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api">
+<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="functional-interface">
+<h2>Functional interface<a class="headerlink" href="#functional-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="genemap.map_ids">
+<code class="descclassname">genemap.</code><code class="descname">map_ids</code><span class="sig-paren">(</span><em>ids</em>, <em>mapper</em>, <em>drop_duplicates='both'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/functional.html#map_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.map_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a list of IDs to new values using the given mapper.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ids</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em></em>) &#8211; List of IDs to map.</li>
+<li><strong>mapper</strong> (<em>str</em>) &#8211; Name of the required mapper (e.g. &#8216;ensembl&#8217;, &#8216;mgi&#8217;, &#8216;custom&#8217;).</li>
+<li><strong>drop_duplicates</strong> (<em>str</em>) &#8211; How to handle duplicates. If &#8216;both&#8217;, then entries with duplicates in
+either the source/target columns are dropped from the mapping. If
+&#8216;mto&#8217; (many-to-one), then only duplicates in the source column are
+dropped. If &#8216;otm&#8217;, then only duplicates in the target column are
+dropped. Finally, if &#8216;none&#8217;, no duplicates are removed from the mapping.</li>
+<li><strong>kwargs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em></em>) &#8211; Extra keyword arguments for the requested mapper.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of mapped IDs.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List[str]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="genemap.map_dataframe">
+<code class="descclassname">genemap.</code><code class="descname">map_dataframe</code><span class="sig-paren">(</span><em>df</em>, <em>mapper</em>, <em>drop_duplicates='both'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/functional.html#map_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.map_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps dataframe index using the given mapper.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>pandas.DataFrame</em>) &#8211; DataFrame to map.</li>
+<li><strong>mapper</strong> (<em>str</em>) &#8211; Name of the required mapper (e.g. &#8216;ensembl&#8217;, &#8216;mgi&#8217;, &#8216;custom&#8217;).</li>
+<li><strong>drop_duplicates</strong> (<em>str</em>) &#8211; How to handle duplicates. If &#8216;both&#8217;, then entries with duplicates in
+either the source/target columns are dropped from the mapping. If
+&#8216;mto&#8217; (many-to-one), then only duplicates in the source column are
+dropped. If &#8216;otm&#8217;, then only duplicates in the target column are
+dropped. Finally, if &#8216;none&#8217;, no duplicates are removed from the mapping.</li>
+<li><strong>kwargs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em></em>) &#8211; Extra keyword arguments for the requested mapper.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of mapped IDs.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List[str]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="genemap.fetch_mapping">
+<code class="descclassname">genemap.</code><code class="descname">fetch_mapping</code><span class="sig-paren">(</span><em>mapper</em>, <em>drop_duplicates='both'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/functional.html#fetch_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.fetch_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches map used by given mapper.</p>
+<p>Returns the mapping that is actually used to map the IDs. This is is mainly
+useful if you are interested in the mapping itself or want to perform more
+complicated mappings than are provided by the map_ids and map_dataframe
+methods.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mapper</strong> (<em>str</em>) &#8211; Name of the required mapper (e.g. &#8216;ensembl&#8217;, &#8216;mgi&#8217;, &#8216;custom&#8217;).</li>
+<li><strong>drop_duplicates</strong> (<em>str</em>) &#8211; How to handle duplicates. If &#8216;both&#8217;, then entries with duplicates in
+either the source/target columns are dropped from the mapping. If
+&#8216;mto&#8217; (many-to-one), then only duplicates in the source column are
+dropped. If &#8216;otm&#8217;, then only duplicates in the target column are
+dropped. Finally, if &#8216;none&#8217;, no duplicates are removed from the mapping.</li>
+<li><strong>kwargs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em></em>) &#8211; Extra keyword arguments for the requested mapper.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">DataFrame describing the used mapping. The DataFrame contains two
+columns, the first of which contains the source idenfiers (from
+which we map), whereas the second contains the target idenfiers
+(to which we map).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="mapper-classes">
+<h2>Mapper classes<a class="headerlink" href="#mapper-classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="genemap.mappers.Mapper">
+<em class="property">class </em><code class="descclassname">genemap.mappers.</code><code class="descname">Mapper</code><span class="sig-paren">(</span><em>drop_duplicates='both'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/base.html#Mapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.Mapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base mapper class.</p>
+<dl class="method">
+<dt id="genemap.mappers.Mapper.fetch_mapping">
+<code class="descname">fetch_mapping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/base.html#Mapper.fetch_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.Mapper.fetch_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches mapping used to map ids.</p>
+<p>Returns the mapping that is actually used to map the IDs. This is
+is mainly useful if you are interested in the mapping itself or want
+to perform more complicated mappings than are provided by the
+<code class="docutils literal"><span class="pre">map_ids</span></code> and <code class="docutils literal"><span class="pre">map_dataframe</span></code> methods.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">DataFrame describing the used mapping. The DataFrame contains two
+columns, the first of which contains the source idenfiers (from
+which we map), whereas the second contains the target idenfiers
+(to which we map).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pandas.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="genemap.mappers.Mapper.map_dataframe">
+<code class="descname">map_dataframe</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/base.html#Mapper.map_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.Mapper.map_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps index of a dataframe to new values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>df</strong> (<em>pandas.DataFrame</em>) &#8211; DataFrame to map.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Mapped DataFrame in which the index values have been mapped
+to a new identifier type.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="genemap.mappers.Mapper.map_ids">
+<code class="descname">map_ids</code><span class="sig-paren">(</span><em>ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/base.html#Mapper.map_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.Mapper.map_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a list of IDs to new values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ids</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em></em>) &#8211; List of IDs to map.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of mapped IDs.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">List[str]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="genemap.mappers.EnsemblMapper">
+<em class="property">class </em><code class="descclassname">genemap.mappers.</code><code class="descname">EnsemblMapper</code><span class="sig-paren">(</span><em>from_type</em>, <em>to_type</em>, <em>drop_duplicates='both'</em>, <em>from_organism='hsapiens'</em>, <em>to_organism=None</em>, <em>host='http://ensembl.org'</em>, <em>drop_lrg=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/ensembl.html#EnsemblMapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.EnsemblMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensembl mapper class.</p>
+<p>Maps IDs using Ensembl (via its Biomart interface). As such, this mapper
+can translate between gene ID types that are available via Ensembls
+Biomart interface, as well as between the different species
+available in Ensembl.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>from_type</strong> (<em>str</em>) &#8211; The source identifier type. Can be the name of any identifier specified
+in the Ensembl database or one of the available aliases (symbol,
+entrez or ensembl).</li>
+<li><strong>to_type</strong> (<em>str</em>) &#8211; The target identifier type (see <code class="docutils literal"><span class="pre">from_type</span></code> for more details).</li>
+<li><strong>drop_duplicates</strong> (<em>str</em>) &#8211; How to handle duplicates. If &#8216;both&#8217;, then entries with duplicates in
+either the source/target columns are dropped from the mapping. If
+&#8216;mto&#8217; (many-to-one), then only duplicates in the source column are
+dropped. If &#8216;otm&#8217;, then only duplicates in the target column are
+dropped. Finally, if &#8216;none&#8217;, no duplicates are removed from the mapping.</li>
+<li><strong>from_organism</strong> (<em>str</em>) &#8211; Name of the source organism.</li>
+<li><strong>to_organism</strong> (<em>str</em>) &#8211; Name of the target organism. If not given, no mapping between
+organisms is performed.</li>
+<li><strong>host</strong> (<em>str</em>) &#8211; The URL to use for accessing Ensembls Biomart. Can be changed to access
+Ensembls archived datasets.</li>
+<li><strong>drop_lrg</strong> (<em>bool</em>) &#8211; Whether to drop gene entries starting with &#8216;LRG&#8217; when mapping to/from
+Ensembl IDs.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="genemap.mappers.EnsemblMapper.available_aliases">
+<code class="descname">available_aliases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/ensembl.html#EnsemblMapper.available_aliases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.EnsemblMapper.available_aliases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the available aliases for gene ids.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dict of aliases.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Dict[str,str]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="genemap.mappers.MgiMapper">
+<em class="property">class </em><code class="descclassname">genemap.mappers.</code><code class="descname">MgiMapper</code><span class="sig-paren">(</span><em>from_type</em>, <em>to_type</em>, <em>drop_duplicates='both'</em>, <em>from_organism='mouse'</em>, <em>to_organism=None</em>, <em>map_url='http://www.informatics.jax.org/downloads/reports/HOM_AllOrganism.rpt'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/mgi.html#MgiMapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.MgiMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>MGI mapper class.</p>
+<p>Maps IDs using the homology table provided by MGI. Supports mapping between
+gene symbols and Entrez identifers and between several specifies
+(using orthologous genes).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>from_type</strong> (<em>str</em>) &#8211; The source identifier type. Can be either &#8216;symbol&#8217; or &#8216;entrez&#8217;.</li>
+<li><strong>to_type</strong> (<em>str</em>) &#8211; The target identifier type (see <code class="docutils literal"><span class="pre">from_type</span></code> for more details).</li>
+<li><strong>drop_duplicates</strong> (<em>str</em>) &#8211; How to handle duplicates. If &#8216;both&#8217;, then entries with duplicates in
+either the source/target columns are dropped from the mapping. If
+&#8216;mto&#8217; (many-to-one), then only duplicates in the source column are
+dropped. If &#8216;otm&#8217;, then only duplicates in the target column are
+dropped. Finally, if &#8216;none&#8217;, no duplicates are removed from the mapping.</li>
+<li><strong>from_organism</strong> (<em>str</em>) &#8211; Name of the source organism.</li>
+<li><strong>to_organism</strong> (<em>str</em>) &#8211; Name of the target organism. If not given, no mapping between
+organisms is performed.</li>
+<li><strong>map_url</strong> (<em>str</em>) &#8211; The URL to use to fetch the mapping table from MGI.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="genemap.mappers.CustomMapper">
+<em class="property">class </em><code class="descclassname">genemap.mappers.</code><code class="descname">CustomMapper</code><span class="sig-paren">(</span><em>mapping</em>, <em>drop_duplicates='both'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/compound.html#CustomMapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.CustomMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom mapper class.</p>
+<p>Maps identifiers using a custom mapping provided by the user. The nature
+of the performed mapping depends on the provided mapping table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mapping</strong> (<em>pandas.DataFrame</em>) &#8211; Dataframe containing the mapping. Is expected to contain exactly two
+columns, the first of which contains the source ID type, the second
+of which contains the target ID type.</li>
+<li><strong>drop_duplicates</strong> (<em>str</em>) &#8211; How to handle duplicates. If &#8216;both&#8217;, then entries with duplicates in
+either the source/target columns are dropped from the mapping. If
+&#8216;mto&#8217; (many-to-one), then only duplicates in the source column are
+dropped. If &#8216;otm&#8217;, then only duplicates in the target column are
+dropped. Finally, if &#8216;none&#8217;, no duplicates are removed from the mapping.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="genemap.mappers.ChainedMapper">
+<em class="property">class </em><code class="descclassname">genemap.mappers.</code><code class="descname">ChainedMapper</code><span class="sig-paren">(</span><em>mappers</em>, <em>drop_duplicates='both'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/compound.html#ChainedMapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.ChainedMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Chained mapper class.</p>
+<p>Maps identifiers using multiple mappers in a chained fashion. In this
+approach the first mapper maps from type a &#8211;&gt; type b, whilst the second
+maps b &#8211;&gt; c, etc. This chained mapper essentially &#8216;chains&#8217; the mappings
+of the given mappers to provide a mapping from the <code class="docutils literal"><span class="pre">to_type</span></code> of the
+first mapper to the <code class="docutils literal"><span class="pre">from_type</span></code> of the last mapper. (In the two mapper
+example, this provides a mapping from a &#8211;&gt; c).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mappers</strong> (<em>List</em><em>[</em><a class="reference internal" href="#genemap.mappers.Mapper" title="genemap.mappers.Mapper"><em>Mapper</em></a><em>]</em><em></em>) &#8211; List of Mapper instances to chain.</li>
+<li><strong>drop_duplicates</strong> (<em>str</em>) &#8211; How to handle duplicates in the mapping.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="genemap.mappers.CombinedMapper">
+<em class="property">class </em><code class="descclassname">genemap.mappers.</code><code class="descname">CombinedMapper</code><span class="sig-paren">(</span><em>mappers</em>, <em>augment=False</em>, <em>drop_duplicates='both'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/genemap/mappers/compound.html#CombinedMapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#genemap.mappers.CombinedMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combined mapper class.</p>
+<p>Maps identifiers by combining the mappings of multiple mappers. In this
+setup, mappers are assumed to map the same identifier types (mapper 1 maps
+from a &#8211;&gt; b, as does mapper 2). The mappers may however not be complete,
+meaning that mapper 2 may contain additional mappings not contained in
+mapper 1 and vice versa. This combined mapper essentially merges the
+mappings from both mappers, providing a more comprehensive mapping
+containing entries from each mapper.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mappers</strong> (<em>List</em><em>[</em><a class="reference internal" href="#genemap.mappers.Mapper" title="genemap.mappers.Mapper"><em>Mapper</em></a><em>]</em><em></em>) &#8211; List of Mapper instances to combine.</li>
+<li><strong>drop_duplicates</strong> (<em>str</em>) &#8211; How to handle duplicates in the mapping.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="command_line.html" class="btn btn-neutral" title="Command line" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Julian de Ruiter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

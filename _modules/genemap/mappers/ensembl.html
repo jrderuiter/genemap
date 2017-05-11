@@ -1,0 +1,506 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>genemap.mappers.ensembl &mdash; Genemap 0.2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="Genemap 0.2.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Genemap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Genemap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_line.html">Command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Genemap</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>genemap.mappers.ensembl</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for genemap.mappers.ensembl</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="o">*</span>
+<span class="c1"># pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pybiomart</span>
+
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">Mapper</span><span class="p">,</span> <span class="n">CommandLineMixin</span><span class="p">,</span> <span class="n">register_mapper</span>
+
+<span class="n">ID_ALIASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;symbol&#39;</span><span class="p">:</span> <span class="s1">&#39;external_gene_name&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;entrez&#39;</span><span class="p">:</span> <span class="s1">&#39;entrezgene&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ensembl&#39;</span><span class="p">:</span> <span class="s1">&#39;ensembl_gene_id&#39;</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="EnsemblMapper"><a class="viewcode-back" href="../../../api.html#genemap.mappers.EnsemblMapper">[docs]</a><span class="k">class</span> <span class="nc">EnsemblMapper</span><span class="p">(</span><span class="n">CommandLineMixin</span><span class="p">,</span> <span class="n">Mapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Ensembl mapper class.</span>
+
+<span class="sd">    Maps IDs using Ensembl (via its Biomart interface). As such, this mapper</span>
+<span class="sd">    can translate between gene ID types that are available via Ensembls</span>
+<span class="sd">    Biomart interface, as well as between the different species</span>
+<span class="sd">    available in Ensembl.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    from_type : str</span>
+<span class="sd">        The source identifier type. Can be the name of any identifier specified</span>
+<span class="sd">        in the Ensembl database or one of the available aliases (symbol,</span>
+<span class="sd">        entrez or ensembl).</span>
+<span class="sd">    to_type : str</span>
+<span class="sd">        The target identifier type (see ``from_type`` for more details).</span>
+<span class="sd">    drop_duplicates : str</span>
+<span class="sd">        How to handle duplicates. If &#39;both&#39;, then entries with duplicates in</span>
+<span class="sd">        either the source/target columns are dropped from the mapping. If</span>
+<span class="sd">        &#39;mto&#39; (many-to-one), then only duplicates in the source column are</span>
+<span class="sd">        dropped. If &#39;otm&#39;, then only duplicates in the target column are</span>
+<span class="sd">        dropped. Finally, if &#39;none&#39;, no duplicates are removed from the mapping.</span>
+<span class="sd">    from_organism : str</span>
+<span class="sd">        Name of the source organism.</span>
+<span class="sd">    to_organism : str</span>
+<span class="sd">        Name of the target organism. If not given, no mapping between</span>
+<span class="sd">        organisms is performed.</span>
+<span class="sd">    host : str</span>
+<span class="sd">        The URL to use for accessing Ensembls Biomart. Can be changed to access</span>
+<span class="sd">        Ensembls archived datasets.</span>
+<span class="sd">    drop_lrg : bool</span>
+<span class="sd">        Whether to drop gene entries starting with &#39;LRG&#39; when mapping to/from</span>
+<span class="sd">        Ensembl IDs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># 80: &#39;may2015.archive.ensembl.org&#39;, Empty datasets?</span>
+    <span class="c1"># &#39;79&#39;: &#39;mar2015.archive.ensembl.org&#39;,</span>
+    <span class="c1"># &#39;78&#39;: &#39;dec2014.archive.ensembl.org&#39;,</span>
+    <span class="c1"># &#39;77&#39;: &#39;oct2014.archive.ensembl.org&#39;,</span>
+    <span class="c1"># &#39;76&#39;: &#39;aug2014.archive.ensembl.org&#39;,</span>
+    <span class="c1"># &#39;75&#39;: &#39;feb2014.archive.ensembl.org&#39;,</span>
+    <span class="c1"># &#39;74&#39;: &#39;dec2013.archive.ensembl.org&#39;,</span>
+    <span class="c1"># &#39;67&#39;: &#39;may2012.archive.ensembl.org&#39;</span>
+
+    <span class="c1"># ID_ALIASES_PRE_76 = dict(ID_ALIASES)</span>
+    <span class="c1"># ID_ALIASES_PRE_76.update({&#39;symbol&#39;: &#39;external_gene_id&#39;})</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">from_type</span><span class="p">,</span>
+                 <span class="n">to_type</span><span class="p">,</span>
+                 <span class="n">drop_duplicates</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span>
+                 <span class="n">from_organism</span><span class="o">=</span><span class="s1">&#39;hsapiens&#39;</span><span class="p">,</span>
+                 <span class="n">to_organism</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">host</span><span class="o">=</span><span class="s1">&#39;http://ensembl.org&#39;</span><span class="p">,</span>
+                 <span class="n">drop_lrg</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">drop_duplicates</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_from_type</span> <span class="o">=</span> <span class="n">from_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_to_type</span> <span class="o">=</span> <span class="n">to_type</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_from_organism</span> <span class="o">=</span> <span class="n">from_organism</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_to_organism</span> <span class="o">=</span> <span class="n">to_organism</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drop_lrg</span> <span class="o">=</span> <span class="n">drop_lrg</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">configure_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--from_organism&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;hsapiens&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--to_organism&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--host&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;ensembl.org&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">from_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">from_type</span><span class="p">,</span>
+                   <span class="n">to_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">to_type</span><span class="p">,</span>
+                   <span class="n">from_organism</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">from_organism</span><span class="p">,</span>
+                   <span class="n">to_organism</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">to_organism</span><span class="p">,</span>
+                   <span class="n">host</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">host</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">_fetch_map</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_from_type</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_to_type</span><span class="p">,</span>
+            <span class="n">from_organism</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_from_organism</span><span class="p">,</span>
+            <span class="n">to_organism</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_organism</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span>
+            <span class="n">drop_lrg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_lrg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mapping</span>
+
+<div class="viewcode-block" id="EnsemblMapper.available_aliases"><a class="viewcode-back" href="../../../api.html#genemap.mappers.EnsemblMapper.available_aliases">[docs]</a>    <span class="k">def</span> <span class="nf">available_aliases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the available aliases for gene ids.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str,str]: Dict of aliases.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ID_ALIASES</span><span class="p">)</span></div></div>
+
+
+<span class="n">register_mapper</span><span class="p">(</span><span class="s1">&#39;ensembl&#39;</span><span class="p">,</span> <span class="n">EnsemblMapper</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_fetch_map</span><span class="p">(</span><span class="n">from_type</span><span class="p">,</span>
+               <span class="n">to_type</span><span class="p">,</span>
+               <span class="n">host</span><span class="p">,</span>
+               <span class="n">from_organism</span><span class="o">=</span><span class="s1">&#39;hsapiens&#39;</span><span class="p">,</span>
+               <span class="n">to_organism</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+               <span class="n">drop_lrg</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fetches ensembl map.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Check we are actually mapping something.</span>
+    <span class="k">if</span> <span class="n">from_type</span> <span class="o">==</span> <span class="n">to_type</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">to_organism</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">from_organism</span> <span class="o">==</span> <span class="n">to_organism</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot map between same id types &#39;</span>
+                             <span class="s1">&#39;within the same organism&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Get mapping.</span>
+    <span class="k">if</span> <span class="n">to_organism</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">_id_map</span><span class="p">(</span>
+            <span class="n">from_type</span><span class="o">=</span><span class="n">from_type</span><span class="p">,</span>
+            <span class="n">to_type</span><span class="o">=</span><span class="n">to_type</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+            <span class="n">organism</span><span class="o">=</span><span class="n">from_organism</span><span class="p">,</span>
+            <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">_id_homology_map</span><span class="p">(</span>
+            <span class="n">from_org</span><span class="o">=</span><span class="n">from_organism</span><span class="p">,</span>
+            <span class="n">to_org</span><span class="o">=</span><span class="n">to_organism</span><span class="p">,</span>
+            <span class="n">from_type</span><span class="o">=</span><span class="n">from_type</span><span class="p">,</span>
+            <span class="n">to_type</span><span class="o">=</span><span class="n">to_type</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+            <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+    <span class="c1"># Hacky fix to avoid pulling along LRG entries together with the</span>
+    <span class="c1"># ENSEMBL ids, which we aren&#39;t interested in.</span>
+    <span class="k">if</span> <span class="n">to_type</span> <span class="o">==</span> <span class="s1">&#39;ensembl&#39;</span> <span class="ow">and</span> <span class="n">drop_lrg</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">mapping</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;LRG_&#39;</span><span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">from_type</span> <span class="o">==</span> <span class="s1">&#39;ensembl&#39;</span> <span class="ow">and</span> <span class="n">drop_lrg</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">mapping</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;LRG_&#39;</span><span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">mapping</span>
+
+
+<span class="k">def</span> <span class="nf">_id_map</span><span class="p">(</span><span class="n">from_type</span><span class="p">,</span> <span class="n">to_type</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">organism</span><span class="o">=</span><span class="s1">&#39;hsapiens&#39;</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="c1"># Try to lookup column as alias.</span>
+    <span class="n">from_column</span> <span class="o">=</span> <span class="n">ID_ALIASES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">from_type</span><span class="p">,</span> <span class="n">from_type</span><span class="p">)</span>
+    <span class="n">to_column</span> <span class="o">=</span> <span class="n">ID_ALIASES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">to_type</span><span class="p">,</span> <span class="n">to_type</span><span class="p">)</span>
+
+    <span class="c1"># Get map_frame from Ensembl.</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pybiomart</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">organism</span> <span class="o">+</span> <span class="s1">&#39;_gene_ensembl&#39;</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+
+    <span class="n">map_frame</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="p">[</span><span class="n">from_column</span><span class="p">,</span> <span class="n">to_column</span><span class="p">])</span>
+
+    <span class="c1"># Override map names to reflect requested types.</span>
+    <span class="n">map_frame</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">_format_name</span><span class="p">(</span><span class="n">organism</span><span class="p">,</span> <span class="n">from_type</span><span class="p">),</span> <span class="n">_format_name</span><span class="p">(</span><span class="n">organism</span><span class="p">,</span> <span class="n">to_type</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">_convert_to_str</span><span class="p">(</span><span class="n">map_frame</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_homology_map</span><span class="p">(</span><span class="n">from_org</span><span class="p">,</span> <span class="n">to_org</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="c1"># Determine column names for version.</span>
+    <span class="n">from_column</span> <span class="o">=</span> <span class="s1">&#39;ensembl_gene_id&#39;</span>
+    <span class="n">to_column</span> <span class="o">=</span> <span class="n">to_org</span> <span class="o">+</span> <span class="s1">&#39;_homolog_ensembl_gene&#39;</span>
+
+    <span class="c1"># Get map_frame from Ensembl.</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pybiomart</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">from_org</span> <span class="o">+</span> <span class="s1">&#39;_gene_ensembl&#39;</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+    <span class="n">map_frame</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="p">[</span><span class="n">from_column</span><span class="p">,</span> <span class="n">to_column</span><span class="p">])</span>
+
+    <span class="c1"># Override map names to reflect requested types.</span>
+    <span class="n">map_frame</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">_format_name</span><span class="p">(</span><span class="n">from_org</span><span class="p">,</span> <span class="s1">&#39;ensembl&#39;</span><span class="p">),</span> <span class="n">_format_name</span><span class="p">(</span><span class="n">to_org</span><span class="p">,</span> <span class="s1">&#39;ensembl&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">_convert_to_str</span><span class="p">(</span><span class="n">map_frame</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_id_homology_map</span><span class="p">(</span><span class="n">from_type</span><span class="p">,</span> <span class="n">to_type</span><span class="p">,</span> <span class="n">from_org</span><span class="p">,</span> <span class="n">to_org</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="c1"># Get &#39;from&#39; map.</span>
+    <span class="k">if</span> <span class="n">from_type</span> <span class="o">!=</span> <span class="s1">&#39;ensembl&#39;</span><span class="p">:</span>
+        <span class="n">from_map</span> <span class="o">=</span> <span class="n">_id_map</span><span class="p">(</span>
+            <span class="n">from_type</span><span class="o">=</span><span class="n">from_type</span><span class="p">,</span>
+            <span class="n">to_type</span><span class="o">=</span><span class="s1">&#39;ensembl&#39;</span><span class="p">,</span>
+            <span class="n">organism</span><span class="o">=</span><span class="n">from_org</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+            <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">from_map</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Get &#39;homology&#39; map.</span>
+    <span class="n">homology_map</span> <span class="o">=</span> <span class="n">_homology_map</span><span class="p">(</span><span class="n">from_org</span><span class="p">,</span> <span class="n">to_org</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+
+    <span class="c1"># Get &#39;to&#39; map.</span>
+    <span class="k">if</span> <span class="n">to_type</span> <span class="o">!=</span> <span class="s1">&#39;ensembl&#39;</span><span class="p">:</span>
+        <span class="n">to_map</span> <span class="o">=</span> <span class="n">_id_map</span><span class="p">(</span>
+            <span class="n">from_type</span><span class="o">=</span><span class="s1">&#39;ensembl&#39;</span><span class="p">,</span>
+            <span class="n">to_type</span><span class="o">=</span><span class="n">to_type</span><span class="p">,</span>
+            <span class="n">organism</span><span class="o">=</span><span class="n">to_org</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+            <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">to_map</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Join the three maps together.</span>
+    <span class="k">if</span> <span class="n">from_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">map_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">from_map</span><span class="p">,</span>
+            <span class="n">homology_map</span><span class="p">,</span>
+            <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+            <span class="n">on</span><span class="o">=</span><span class="n">_format_name</span><span class="p">(</span><span class="n">from_org</span><span class="p">,</span> <span class="s1">&#39;ensembl&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">map_frame</span> <span class="o">=</span> <span class="n">homology_map</span>
+
+    <span class="k">if</span> <span class="n">to_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">map_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">map_frame</span><span class="p">,</span> <span class="n">to_map</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">_format_name</span><span class="p">(</span><span class="n">to_org</span><span class="p">,</span> <span class="s1">&#39;ensembl&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Select the to/from columns.</span>
+    <span class="n">from_col</span> <span class="o">=</span> <span class="n">_format_name</span><span class="p">(</span><span class="n">from_org</span><span class="p">,</span> <span class="n">from_type</span><span class="p">)</span>
+    <span class="n">to_col</span> <span class="o">=</span> <span class="n">_format_name</span><span class="p">(</span><span class="n">to_org</span><span class="p">,</span> <span class="n">to_type</span><span class="p">)</span>
+    <span class="n">map_frame</span> <span class="o">=</span> <span class="n">map_frame</span><span class="p">[[</span><span class="n">from_col</span><span class="p">,</span> <span class="n">to_col</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">map_frame</span>
+
+
+<span class="k">def</span> <span class="nf">_format_name</span><span class="p">(</span><span class="n">organism</span><span class="p">,</span> <span class="n">id_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">organism</span><span class="p">,</span> <span class="n">id_name</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_convert_to_str</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_series_to_str</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_series_to_str</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">object_</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_value_to_str</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_value_to_str</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Julian de Ruiter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>genemap.mappers.compound &mdash; Genemap 0.2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="Genemap 0.2.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Genemap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Genemap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../command_line.html">Command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Genemap</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>genemap.mappers.compound</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for genemap.mappers.compound</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="o">*</span>
+<span class="c1"># pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">reduce</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">Mapper</span><span class="p">,</span> <span class="n">register_mapper</span>
+
+
+<div class="viewcode-block" id="CustomMapper"><a class="viewcode-back" href="../../../api.html#genemap.mappers.CustomMapper">[docs]</a><span class="k">class</span> <span class="nc">CustomMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom mapper class.</span>
+
+<span class="sd">    Maps identifiers using a custom mapping provided by the user. The nature</span>
+<span class="sd">    of the performed mapping depends on the provided mapping table.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mapping : pandas.DataFrame</span>
+<span class="sd">        Dataframe containing the mapping. Is expected to contain exactly two</span>
+<span class="sd">        columns, the first of which contains the source ID type, the second</span>
+<span class="sd">        of which contains the target ID type.</span>
+<span class="sd">    drop_duplicates : str</span>
+<span class="sd">        How to handle duplicates. If &#39;both&#39;, then entries with duplicates in</span>
+<span class="sd">        either the source/target columns are dropped from the mapping. If</span>
+<span class="sd">        &#39;mto&#39; (many-to-one), then only duplicates in the source column are</span>
+<span class="sd">        dropped. If &#39;otm&#39;, then only duplicates in the target column are</span>
+<span class="sd">        dropped. Finally, if &#39;none&#39;, no duplicates are removed from the mapping.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mapping</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Requires a dataframe containing exactly two columns&#39;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">drop_duplicates</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_map</span> <span class="o">=</span> <span class="n">mapping</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span></div>
+
+
+<span class="n">register_mapper</span><span class="p">(</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="n">CustomMapper</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ChainedMapper"><a class="viewcode-back" href="../../../api.html#genemap.mappers.ChainedMapper">[docs]</a><span class="k">class</span> <span class="nc">ChainedMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Chained mapper class.</span>
+
+<span class="sd">    Maps identifiers using multiple mappers in a chained fashion. In this</span>
+<span class="sd">    approach the first mapper maps from type a --&gt; type b, whilst the second</span>
+<span class="sd">    maps b --&gt; c, etc. This chained mapper essentially &#39;chains&#39; the mappings</span>
+<span class="sd">    of the given mappers to provide a mapping from the ``to_type`` of the</span>
+<span class="sd">    first mapper to the ``from_type`` of the last mapper. (In the two mapper</span>
+<span class="sd">    example, this provides a mapping from a --&gt; c).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mappers : List[Mapper]</span>
+<span class="sd">        List of Mapper instances to chain.</span>
+<span class="sd">    drop_duplicates : str</span>
+<span class="sd">        How to handle duplicates in the mapping.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mappers</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mappers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;At least two mappers must be provided&#39;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">drop_duplicates</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mappers</span> <span class="o">=</span> <span class="n">mappers</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_chain_maps</span><span class="p">(</span><span class="n">df_a</span><span class="p">,</span> <span class="n">df_b</span><span class="p">):</span>
+            <span class="n">df_b</span> <span class="o">=</span> <span class="n">df_b</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">df_b</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">df_a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]})</span>
+            <span class="n">merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_a</span><span class="p">,</span> <span class="n">df_b</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">df_a</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">merged</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="n">mappings</span> <span class="o">=</span> <span class="p">(</span><span class="n">mapper</span><span class="o">.</span><span class="n">fetch_mapping</span><span class="p">()</span> <span class="k">for</span> <span class="n">mapper</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mappers</span><span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">_chain_maps</span><span class="p">,</span> <span class="n">mappings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mapping</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span></div>
+
+
+<span class="n">register_mapper</span><span class="p">(</span><span class="s1">&#39;chained&#39;</span><span class="p">,</span> <span class="n">ChainedMapper</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CombinedMapper"><a class="viewcode-back" href="../../../api.html#genemap.mappers.CombinedMapper">[docs]</a><span class="k">class</span> <span class="nc">CombinedMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combined mapper class.</span>
+
+<span class="sd">    Maps identifiers by combining the mappings of multiple mappers. In this</span>
+<span class="sd">    setup, mappers are assumed to map the same identifier types (mapper 1 maps</span>
+<span class="sd">    from a --&gt; b, as does mapper 2). The mappers may however not be complete,</span>
+<span class="sd">    meaning that mapper 2 may contain additional mappings not contained in</span>
+<span class="sd">    mapper 1 and vice versa. This combined mapper essentially merges the</span>
+<span class="sd">    mappings from both mappers, providing a more comprehensive mapping</span>
+<span class="sd">    containing entries from each mapper.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mappers : List[Mapper]</span>
+<span class="sd">        List of Mapper instances to combine.</span>
+<span class="sd">    drop_duplicates : str</span>
+<span class="sd">        How to handle duplicates in the mapping.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mappers</span><span class="p">,</span> <span class="n">augment</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mappers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;At least two mappers must be provided&#39;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">drop_duplicates</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mappers</span> <span class="o">=</span> <span class="n">mappers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_augment</span> <span class="o">=</span> <span class="n">augment</span>
+
+    <span class="k">def</span> <span class="nf">_fetch_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Combine mappings, using column names from first dataframe.</span>
+        <span class="n">mappings</span> <span class="o">=</span> <span class="p">(</span><span class="n">mapper</span><span class="o">.</span><span class="n">fetch_mapping</span><span class="p">()</span> <span class="k">for</span> <span class="n">mapper</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mappers</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_augment</span><span class="p">:</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_augment_mappings</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_mappings</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mapping</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_merge_mappings</span><span class="p">(</span><span class="n">mappings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Concats mappings, dropping only exact duplicates.&quot;&quot;&quot;</span>
+
+        <span class="n">mappings</span> <span class="o">=</span> <span class="n">_consolidate_column_names</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">mappings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mapping</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_augment_mappings</span><span class="p">(</span><span class="n">mappings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Concats mappings, dropping overlaps (based on from column).&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_augment_frame</span><span class="p">(</span><span class="n">df_a</span><span class="p">,</span> <span class="n">df_b</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Merges a and b, dropping overlaps from b (from column).&quot;&quot;&quot;</span>
+            <span class="n">values_a</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">df_a</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">filt_b</span> <span class="o">=</span> <span class="n">df_b</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">df_b</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">values_a</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_a</span><span class="p">,</span> <span class="n">filt_b</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">mappings</span> <span class="o">=</span> <span class="n">_consolidate_column_names</span><span class="p">(</span><span class="n">mappings</span><span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">_augment_frame</span><span class="p">,</span> <span class="n">mappings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mapping</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span></div>
+
+
+<span class="n">register_mapper</span><span class="p">(</span><span class="s1">&#39;combined&#39;</span><span class="p">,</span> <span class="n">CombinedMapper</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_consolidate_column_names</span><span class="p">(</span><span class="n">dataframes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns dataframes with the same column names as the first dataframe.&quot;&quot;&quot;</span>
+
+    <span class="n">first</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataframes</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">first</span>
+
+    <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dataframes</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">columns</span>
+        <span class="k">yield</span> <span class="n">df</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Julian de Ruiter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

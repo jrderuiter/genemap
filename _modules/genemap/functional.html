@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>genemap.functional &mdash; Genemap 0.2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Genemap 0.2.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Genemap
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Genemap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../command_line.html">Command line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Genemap</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>genemap.functional</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for genemap.functional</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="c1"># pylint: enable=wildcard-import,redefined-builtin,unused-wildcard-import</span>
+
+<span class="kn">from</span> <span class="nn">.mappers</span> <span class="k">import</span> <span class="n">get_mappers</span>
+
+
+<div class="viewcode-block" id="map_ids"><a class="viewcode-back" href="../../api.html#genemap.map_ids">[docs]</a><span class="k">def</span> <span class="nf">map_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">mapper</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Maps a list of IDs to new values using the given mapper.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ids : List[str]</span>
+<span class="sd">        List of IDs to map.</span>
+<span class="sd">    mapper : str</span>
+<span class="sd">        Name of the required mapper (e.g. &#39;ensembl&#39;, &#39;mgi&#39;, &#39;custom&#39;).</span>
+<span class="sd">    drop_duplicates : str</span>
+<span class="sd">        How to handle duplicates. If &#39;both&#39;, then entries with duplicates in</span>
+<span class="sd">        either the source/target columns are dropped from the mapping. If</span>
+<span class="sd">        &#39;mto&#39; (many-to-one), then only duplicates in the source column are</span>
+<span class="sd">        dropped. If &#39;otm&#39;, then only duplicates in the target column are</span>
+<span class="sd">        dropped. Finally, if &#39;none&#39;, no duplicates are removed from the mapping.</span>
+<span class="sd">    kwargs : Dict[str, Any]</span>
+<span class="sd">        Extra keyword arguments for the requested mapper.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        List of mapped IDs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">mapper_obj</span> <span class="o">=</span> <span class="n">_build_mapper</span><span class="p">(</span>
+        <span class="n">mapper</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mapper_obj</span><span class="o">.</span><span class="n">map_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_build_mapper</span><span class="p">(</span><span class="n">mapper</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">mapper_class</span> <span class="o">=</span> <span class="n">get_mappers</span><span class="p">()[</span><span class="n">mapper</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown mapper </span><span class="si">{!r}</span><span class="s1">. Available mappers are: </span><span class="si">{}</span><span class="s1">.&#39;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mapper</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_mappers</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+
+    <span class="k">return</span> <span class="n">mapper_class</span><span class="p">(</span><span class="n">drop_duplicates</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="map_dataframe"><a class="viewcode-back" href="../../api.html#genemap.map_dataframe">[docs]</a><span class="k">def</span> <span class="nf">map_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mapper</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Maps dataframe index using the given mapper.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        DataFrame to map.</span>
+<span class="sd">    mapper : str</span>
+<span class="sd">        Name of the required mapper (e.g. &#39;ensembl&#39;, &#39;mgi&#39;, &#39;custom&#39;).</span>
+<span class="sd">    drop_duplicates : str</span>
+<span class="sd">        How to handle duplicates. If &#39;both&#39;, then entries with duplicates in</span>
+<span class="sd">        either the source/target columns are dropped from the mapping. If</span>
+<span class="sd">        &#39;mto&#39; (many-to-one), then only duplicates in the source column are</span>
+<span class="sd">        dropped. If &#39;otm&#39;, then only duplicates in the target column are</span>
+<span class="sd">        dropped. Finally, if &#39;none&#39;, no duplicates are removed from the mapping.</span>
+<span class="sd">    kwargs : Dict[str, Any]</span>
+<span class="sd">        Extra keyword arguments for the requested mapper.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        List of mapped IDs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">mapper_obj</span> <span class="o">=</span> <span class="n">_build_mapper</span><span class="p">(</span>
+        <span class="n">mapper</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mapper_obj</span><span class="o">.</span><span class="n">map_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fetch_mapping"><a class="viewcode-back" href="../../api.html#genemap.fetch_mapping">[docs]</a><span class="k">def</span> <span class="nf">fetch_mapping</span><span class="p">(</span><span class="n">mapper</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fetches map used by given mapper.</span>
+
+<span class="sd">    Returns the mapping that is actually used to map the IDs. This is is mainly</span>
+<span class="sd">    useful if you are interested in the mapping itself or want to perform more</span>
+<span class="sd">    complicated mappings than are provided by the map_ids and map_dataframe</span>
+<span class="sd">    methods.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mapper : str</span>
+<span class="sd">        Name of the required mapper (e.g. &#39;ensembl&#39;, &#39;mgi&#39;, &#39;custom&#39;).</span>
+<span class="sd">    drop_duplicates : str</span>
+<span class="sd">        How to handle duplicates. If &#39;both&#39;, then entries with duplicates in</span>
+<span class="sd">        either the source/target columns are dropped from the mapping. If</span>
+<span class="sd">        &#39;mto&#39; (many-to-one), then only duplicates in the source column are</span>
+<span class="sd">        dropped. If &#39;otm&#39;, then only duplicates in the target column are</span>
+<span class="sd">        dropped. Finally, if &#39;none&#39;, no duplicates are removed from the mapping.</span>
+<span class="sd">    kwargs : Dict[str, Any]</span>
+<span class="sd">        Extra keyword arguments for the requested mapper.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        DataFrame describing the used mapping. The DataFrame contains two</span>
+<span class="sd">        columns, the first of which contains the source idenfiers (from</span>
+<span class="sd">        which we map), whereas the second contains the target idenfiers</span>
+<span class="sd">        (to which we map).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">mapper_obj</span> <span class="o">=</span> <span class="n">_build_mapper</span><span class="p">(</span>
+        <span class="n">mapper</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span> <span class="n">drop_duplicates</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mapper_obj</span><span class="o">.</span><span class="n">fetch_mapping</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Julian de Ruiter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

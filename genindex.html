@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -8,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Genemap &mdash; Genemap 0.2.0 documentation</title>
+  <title>Index &mdash; Genemap 0.2.0 documentation</title>
   
 
   
@@ -33,10 +34,9 @@
 
   
         <link rel="index" title="Index"
-              href="genindex.html"/>
+              href="#"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Genemap 0.2.0 documentation" href="#"/>
-        <link rel="next" title="Installation" href="installation.html"/> 
+    <link rel="top" title="Genemap 0.2.0 documentation" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -55,7 +55,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> Genemap
+            <a href="index.html" class="icon icon-home"> Genemap
           
 
           
@@ -89,8 +89,8 @@
               
             
             
-              <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Genemap</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Genemap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
@@ -113,7 +113,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">Genemap</a>
+          <a href="index.html">Genemap</a>
         
       </nav>
 
@@ -141,16 +141,14 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="#">Docs</a> &raquo;</li>
+      <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Genemap</li>
+      <li>Index</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -162,37 +160,83 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="genemap">
-<h1>Genemap<a class="headerlink" href="#genemap" title="Permalink to this headline">¶</a></h1>
-<p>Genemap is a python library for mapping (gene) identifiers. Genemaps main
-purpose is provide an easy approach for mapping (gene) identifers
-from one identifier type to another, which is unfortunately often not a trivial
-task. This may be useful for translating identifiers into a format that you
-are more familiar with (such as gene symbols instead of Ensembl IDs) or
-even for translating between different species (e.g., from mouse IDs to human
-IDs) to compare datasets or annotations between species.</p>
-<p>Genemap currently supports the following mappings:</p>
-<blockquote>
-<div><ul class="simple">
-<li><strong>EnsemblMapper</strong> - Translates identifiers using Ensembl
-via Biomart. Supports mapping between various types of gene identifiers
-that are present in Ensembl (gene symbols, Ensembl/Entrez identifiers,
-e.g.) and between different species (using orthologous genes).</li>
-<li><strong>MgiMapper</strong> - Translates identifers using the homology table
-provided by MGI. Supports mapping between gene symbols and Entrez
-identifers and between several specifies (using orthologous genes).</li>
-<li><strong>CustomMapper</strong> - Translates identifiers using a custom mapping
-provided by the user. The nature of the performed mapping depends on the
-provided mapping table.</li>
-</ul>
-</div></blockquote>
-<p>For a complete overview of the provided mappers and their basic usage, see the
-the <a class="reference internal" href="overview.html#overview"><span class="std std-ref">Overview</span></a> and <a class="reference internal" href="usage.html#usage"><span class="std std-ref">Usage</span></a> sections. More details on the API are
-available in the <a class="reference internal" href="api.html#api"><span class="std std-ref">API</span></a> section. Finally, for an overview of genemaps
-command line usage, see the <a class="reference internal" href="command_line.html#command-line"><span class="std std-ref">Command line</span></a> section.</p>
-<div class="toctree-wrapper compound">
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ 
 </div>
-</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#genemap.mappers.EnsemblMapper.available_aliases">available_aliases() (genemap.mappers.EnsemblMapper method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#genemap.mappers.ChainedMapper">ChainedMapper (class in genemap.mappers)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#genemap.mappers.CombinedMapper">CombinedMapper (class in genemap.mappers)</a>
+</li>
+      <li><a href="api.html#genemap.mappers.CustomMapper">CustomMapper (class in genemap.mappers)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#genemap.mappers.EnsemblMapper">EnsemblMapper (class in genemap.mappers)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#genemap.mappers.Mapper.fetch_mapping">fetch_mapping() (genemap.mappers.Mapper method)</a>
+
+      <ul>
+        <li><a href="api.html#genemap.fetch_mapping">(in module genemap)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#genemap.mappers.Mapper.map_dataframe">map_dataframe() (genemap.mappers.Mapper method)</a>
+
+      <ul>
+        <li><a href="api.html#genemap.map_dataframe">(in module genemap)</a>
+</li>
+      </ul></li>
+      <li><a href="api.html#genemap.mappers.Mapper.map_ids">map_ids() (genemap.mappers.Mapper method)</a>
+
+      <ul>
+        <li><a href="api.html#genemap.map_ids">(in module genemap)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#genemap.mappers.Mapper">Mapper (class in genemap.mappers)</a>
+</li>
+      <li><a href="api.html#genemap.mappers.MgiMapper">MgiMapper (class in genemap.mappers)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 
 
            </div>
@@ -201,13 +245,6 @@ command line usage, see the <a class="reference internal" href="command_line.htm
            </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-    </div>
   
 
   <hr/>

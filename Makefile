@@ -49,22 +49,18 @@ lint: ## check style with flake8
 	pylint src/genemap tests
 
 test: ## run tests quickly with the default Python
-	py.test
+	rm .genemap.sqlite
+	py.test tests
+
+tox: clean
+	docker run -v `pwd`:/app -t -i themattrix/tox-base
 
 coverage: ## check code coverage quickly with the default Python
 	py.test --cov=geneviz --cov-report=html
 	$(BROWSER) htmlcov/index.html
 
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/geneviz.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ geneviz
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
-
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+docs: ## generate and serve Sphinx documentation
+	sphinx-autobuild docs docs/_build
 
 release: clean ## package and upload a release
 	python setup.py sdist upload

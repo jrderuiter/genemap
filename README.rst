@@ -1,5 +1,5 @@
 Genemap
-================
+=======
 
 .. image:: https://travis-ci.org/jrderuiter/genemap.svg?branch=master
     :target: https://travis-ci.org/jrderuiter/genemap
@@ -7,66 +7,21 @@ Genemap
 .. image:: https://coveralls.io/repos/github/jrderuiter/genemap/badge.svg?branch=master
     :target: https://coveralls.io/github/jrderuiter/genemap?branch=master
 
-Genemap is a simple python library for mapping gene identifiers between
-different identifier types and different species. This mapping is currently
-performed using Ensembl, though different mappers may be added in the
-future.
+Genemap is a python library for mapping (gene) identifiers. Genemaps main
+purpose is provide an easy approach for mapping (gene) identifers from one
+identifier type to another, which is unfortunately often not a trivial task.
+This may be useful for translating identifiers into a format that you are more
+familiar with (such as gene symbols instead of Ensembl IDs) or even for
+translating between different species (e.g., from mouse IDs to human IDs)
+to compare datasets or annotations between species.
 
 Documentation
-----------------
+-------------
 
-Detailed documentation will soon be available on ReadTheDocs.
-
-Examples
-----------------
-
-Translating human gene symbols to ensembl ids:
-
-.. code::
-
-    from genemap import map_ids
-
-    map_ids(['FGFR2', 'MYH9'], from_type='symbol', to_type='ensembl')
-
-Translating human gene symbols to mouse gene symbols:
-
-.. code::
-
-    map_ids(['FGFR2', 'MYH9'], from_type='symbol', to_type='ensembl',
-            from_org='hsapiens', to_org='mmusculus')
-
-
-Mapping an indexed pandas DataFrame:
-
-.. code::
-
-  from genemap import map_frame
-
-  map_frame(df, from_type='symbol', to_type='ensembl',
-            from_org='hsapiens', to_org='mmusculus')
-
-
-Installation
-----------------
-
-The source code is currently hosted on GitHub at: `https://github.com/jrderuiter/genemap  <https://github.com/jrderuiter/genemap>`_.
-
-The package can be installed via pip:
-
-.. code::
-
-    pip install git+git://github.com/jrderuiter/genemap.git#egg=genemap
-
-It will also soon be available in pypi.
-
-Dependencies
-----------------
-- Python 2.7, 3.3+
-- future
-- pandas
-- `pybiomart <https://github.com/jrderuiter/pybiomart>`_
+Genemaps documentation is available at
+`jrderuiter.github.io/genemap <http://jrderuiter.github.io/genemap/>`_.
 
 License
-----------------
+-------
 
 Released under the MIT license.

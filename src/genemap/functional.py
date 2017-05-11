@@ -115,4 +115,4 @@ def fetch_mapping(mapper, drop_duplicates='both', **kwargs):
 
     mapper_obj = _build_mapper(
         mapper=mapper, drop_duplicates=drop_duplicates, **kwargs)
-    return mapper_obj.mapping
+    return mapper_obj.fetch_mapping()

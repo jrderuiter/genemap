@@ -141,7 +141,7 @@ class Mapper(object):
         mapping = self.fetch_mapping()
         mapping = util.drop_duplicates(mapping, how=self._drop_duplicates)
 
-        index_name = df.index.name
+        index_name = df.index.name or 'index'
         from_col, to_col = mapping.columns
 
         mapped = pd.merge(

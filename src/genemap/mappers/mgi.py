@@ -17,8 +17,15 @@ import requests_cache
 
 from .base import Mapper, CommandLineMixin, register_mapper
 
-ID_TYPES = {'symbol', 'entrez'}
+MAP_IDS = {'symbol', 'entrez'}
 MAP_URL = 'http://www.informatics.jax.org/downloads/reports/HOM_AllOrganism.rpt'
+
+MAP_DTYPES = {
+    'HomoloGene ID': 'str',
+    'Common Organism Name': 'str',
+    'Symbol': 'str',
+    'EntrezGene ID': 'str'
+}
 
 requests_cache.install_cache('.genemap')
 
@@ -76,8 +83,8 @@ class MgiMapper(CommandLineMixin, Mapper):
 
     @classmethod
     def configure_parser(cls, parser):
-        parser.add_argument('--from_type', required=True, choices=ID_TYPES)
-        parser.add_argument('--to_type', required=True, choices=ID_TYPES)
+        parser.add_argument('--from_type', required=True, choices=MAP_IDS)
+        parser.add_argument('--to_type', required=True, choices=MAP_IDS)
         parser.add_argument('--from_organism', default='mouse')
         parser.add_argument('--to_organism', default=None)
         parser.add_argument('--drop_duplicates', default='both')
@@ -95,7 +102,7 @@ class MgiMapper(CommandLineMixin, Mapper):
     def _fetch_mapping(self):
         # Fetch and read MGI data.
         req = requests.get(self._map_url)
-        data = pd.read_csv(StringIO(req.text), sep='\t')
+        data = pd.read_csv(StringIO(req.text), sep='\t', dtype=MAP_DTYPES)
 
         # Subset and tidy column names.
         column_map = {

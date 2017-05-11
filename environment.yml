@@ -13,7 +13,7 @@ dependencies:
         # Required dependencies.
         - requests_cache
         - git+https://github.com/jrderuiter/pybiomart.git
-        - git+https://github.com/jrderuiter/genemap.git
+        # - git+https://github.com/jrderuiter/genemap.git
 
         # Testing dependencies.
         - pytest-cov

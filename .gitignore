@@ -1,0 +1,5 @@
+.genemap.sqlite
+.tox
+.vscode
+.cache
+tests

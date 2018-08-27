@@ -114,7 +114,7 @@ class Mapper(object):
         lookup = mapping.set_index(from_col)[to_col]
 
         try:
-            mapped = lookup.loc[ids]
+            mapped = lookup.reindex(ids)    
             mapped = list(mapped.where((pd.notnull(mapped)), None))
         except KeyError:
             # None of the ids are in the index.

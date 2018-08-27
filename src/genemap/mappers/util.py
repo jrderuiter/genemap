@@ -26,12 +26,12 @@ def drop_duplicates(mapping, how='both'):
     # Apply column masks.
     masks = [_duplicate_mask(mapping, c) for c in columns]
     mask = reduce(lambda m1, m2: m1 | m2, masks)
-    masked_mapping = mapping.ix[~mask]
+    masked_mapping = mapping[~mask]
 
     return masked_mapping
 
 
 def _duplicate_mask(frame, column):
     duplicate_rows = frame.duplicated(subset=column)
-    duplicate_values = set(frame.ix[duplicate_rows][column])
+    duplicate_values = set(frame[duplicate_rows][column])
     return frame[column].isin(duplicate_values)
